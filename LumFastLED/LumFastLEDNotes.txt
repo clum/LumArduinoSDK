@@ -1,0 +1,4 @@
+These are custom functions, modifications, additions, etc. to functionality provided by the FastLED library.
+
+Christopher Lum
+lum@uw.edu

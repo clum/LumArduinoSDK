@@ -14,7 +14,7 @@ Version History
 #define LED_TYPE        WS2812
 #define LED_COLOR_ORDER GRB
 
-#define PIN_LED         7
+#define PIN_LED         3
 #define NUM_LEDS        60
 
 //Constants

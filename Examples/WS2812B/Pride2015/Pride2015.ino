@@ -18,7 +18,7 @@ Version History
 #define LED_TYPE    WS2811
 #define COLOR_ORDER GRB
 
-#define PIN_LED     7
+#define PIN_LED     3
 #define NUM_LEDS    60
 
 #define BRIGHTNESS  255
