@@ -8,6 +8,7 @@ lum@uw.edu
 
 Version History
 11/17/21: created
+12/12/21: refactored function naming
 */
 
 //Constants
@@ -34,10 +35,10 @@ void loop() {
   digitalWrite(PinHCS04Trigger,LOW);
 
   //obtain the response from the echo pin
-  long duration_ms = pulseIn(PinHCS04Echo,HIGH);
+  long timeOfFlight_microseconds = pulseIn(PinHCS04Echo,HIGH);
 
   //convert to distance
-  int distance_cm = duration_ms*0.034/2;  
+  int distance_cm = timeOfFlight_microseconds*0.034/2;  
   
   Serial.println("distance_cm = "+(String)distance_cm);  
 }
