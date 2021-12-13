@@ -38,11 +38,11 @@ void setup() {
 void loop() {
   
   CRGB color = CRGB(150,25,10);
-  
+
+  //Chose a pattern
   //rise(leds,NUM_LEDS,color);
   //fall(leds,NUM_LEDS,color);
-  //riseAndFall(leds,NUM_LEDS,color);
-  rainbowLum(leds,NUM_LEDS);
+  riseAndFall(leds,NUM_LEDS,color);
   
   FastLED.show();    
 }

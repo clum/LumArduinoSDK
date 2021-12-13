@@ -184,3 +184,28 @@ void rainbowLum(CRGB* leds, int numLEDs)
         nblend(leds[pixelnumber], newcolor, 64);
     }
 }
+
+/// <summary>
+/// 
+/// </summary>
+/// <param name="leds"></param>
+/// <param name="numLEDs"></param>
+/// <param name="chanceOfGlitter">See addGlitter</param>
+void rainbowWithGlitterLum(CRGB* leds, int numLEDs, fract8 chanceOfGlitter)
+{
+    rainbowLum(leds, numLEDs);
+    addGlitter(leds, numLEDs, chanceOfGlitter);
+}
+
+/// <summary>
+/// Adds a sparkling/glitter effect to a pattern by randomly turning some LEDs on to full white.
+/// </summary>
+/// <param name="leds"></param>
+/// <param name="numLEDs"></param>
+/// <param name="chanceOfGlitter">value between 0 and 100 (default value of 20)</param>
+void addGlitter(CRGB* leds, int numLEDs, fract8 chanceOfGlitter)
+{
+    if (random8() < chanceOfGlitter) {
+        leds[random16(numLEDs)] += CRGB::White;
+    }
+}
