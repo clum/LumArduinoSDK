@@ -3,6 +3,9 @@
 
 #include "FastLED.h"
 
-void rainbow(CRGB* leds, int numLEDs);
+void rise(CRGB* leds, int numLEDs, CRGB color, uint16_t deltaT_ms = 20);
+void fall(CRGB* leds, int numLEDs, CRGB color, uint16_t deltaT_ms = 20);
+void riseAndFall(CRGB* leds, int numLEDs, CRGB color, uint16_t deltaT_ms = 20);
+void rainbowLum(CRGB* leds, int numLEDs);
 
 #endif

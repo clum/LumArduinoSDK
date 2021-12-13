@@ -1,6 +1,3 @@
-#include "FastLED.h"
-#include "LumFastLED.h"
-
 /*
 Modify the Pride2015 example by Mark Kriegsman from the FastLED library for other purposes.
 
@@ -13,18 +10,20 @@ Version History
 12/12/21: Created
  */
 
+#include "FastLED.h"
+#include "LumFastLED.h"
 
 #if FASTLED_VERSION < 3001000
 #error "Requires FastLED 3.1 or later; check github for latest code."
 #endif
 
-#define LED_TYPE    WS2811
+#define LED_TYPE    WS2812B
 #define COLOR_ORDER GRB
 
 #define PIN_LED     3
 #define NUM_LEDS    60
 
-#define BRIGHTNESS  10
+#define BRIGHTNESS  96
 
 //constants
 CRGB leds[NUM_LEDS];
@@ -44,6 +43,6 @@ void setup() {
 
 void loop()
 {
-  rainbow(leds,NUM_LEDS);
+  rainbowLum(leds,NUM_LEDS);
   FastLED.show();  
 }

@@ -1,0 +1,38 @@
+/*
+Test the lumRainbow function from the LumFastLED library.
+
+Christopher Lum
+lum@uw.edu
+
+Version History
+12/12/21: created
+*/
+
+#include <FastLED.h>
+#include "LumFastLED.h"
+
+#define LED_TYPE        WS2812
+#define LED_COLOR_ORDER GRB
+
+#define PIN_LED         3
+#define NUM_LEDS        60
+
+#define BRIGHTNESS  96
+
+//Constants
+CRGB leds[NUM_LEDS];
+
+void setup() {
+  //tell FastLED about the LED strip configuration
+  FastLED.addLeds<LED_TYPE,PIN_LED,LED_COLOR_ORDER>(leds,NUM_LEDS)
+    .setCorrection(TypicalLEDStrip)
+    .setDither(BRIGHTNESS < 255);
+
+    //set master brightness control
+    FastLED.setBrightness(BRIGHTNESS);
+}
+
+void loop() {
+  rainbowLum(leds,NUM_LEDS);
+  FastLED.show();    
+}

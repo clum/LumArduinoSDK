@@ -1,13 +1,26 @@
+/*
+Modify the ColorPalette example from the FastLED library.
+
+Modified by Christopher Lum
+lum@uw.edu
+
+Version History
+12/12/21: Created
+ */
 #include <FastLED.h>
 
-#define LED_PIN     3
-#define NUM_LEDS    60
-#define BRIGHTNESS  64
-#define LED_TYPE    WS2811
+#define LED_TYPE    WS2812B
 #define COLOR_ORDER GRB
-CRGB leds[NUM_LEDS];
+
+#define PIN_LED     3
+#define NUM_LEDS    60
+
+#define BRIGHTNESS  64
 
 #define UPDATES_PER_SECOND 100
+
+//constants
+CRGB leds[NUM_LEDS];
 
 // This example shows several ways to set up and use 'palettes' of colors
 // with FastLED.
@@ -25,25 +38,20 @@ CRGB leds[NUM_LEDS];
 //
 // Some notes on the more abstract 'theory and practice' of
 // FastLED compact palettes are at the bottom of this file.
-
-
-
 CRGBPalette16 currentPalette;
 TBlendType    currentBlending;
 
 extern CRGBPalette16 myRedWhiteBluePalette;
 extern const TProgmemPalette16 myRedWhiteBluePalette_p PROGMEM;
 
-
 void setup() {
     delay( 3000 ); // power-up safety delay
-    FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
+    FastLED.addLeds<LED_TYPE, PIN_LED, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
     FastLED.setBrightness(  BRIGHTNESS );
     
     currentPalette = RainbowColors_p;
     currentBlending = LINEARBLEND;
 }
-
 
 void loop()
 {
@@ -118,8 +126,7 @@ void SetupBlackAndWhiteStripedPalette()
     currentPalette[0] = CRGB::White;
     currentPalette[4] = CRGB::White;
     currentPalette[8] = CRGB::White;
-    currentPalette[12] = CRGB::White;
-    
+    currentPalette[12] = CRGB::White;    
 }
 
 // This function sets up a palette of purple and green stripes.
@@ -135,7 +142,6 @@ void SetupPurpleAndGreenPalette()
                                    green,  green,  black,  black,
                                    purple, purple, black,  black );
 }
-
 
 // This example shows how to set up a static color palette
 // which is stored in PROGMEM (flash), which is almost always more
@@ -162,8 +168,6 @@ const TProgmemPalette16 myRedWhiteBluePalette_p PROGMEM =
     CRGB::Black,
     CRGB::Black
 };
-
-
 
 // Additional notes on FastLED compact palettes:
 //

@@ -15,7 +15,7 @@ Version History
 #error "Requires FastLED 3.1 or later; check github for latest code."
 #endif
 
-#define LED_TYPE    WS2811
+#define LED_TYPE    WS2812B
 #define COLOR_ORDER GRB
 
 #define PIN_LED     3
