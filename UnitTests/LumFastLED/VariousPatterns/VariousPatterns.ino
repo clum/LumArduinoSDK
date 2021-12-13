@@ -37,7 +37,7 @@ void setup() {
 
 void loop() {
   //user selections
-  int patternSelection = 2;
+  int patternSelection = 6;
   
   //Chose a pattern
   if(patternSelection==0) {
@@ -67,7 +67,20 @@ void loop() {
     rainbowWithGlitterLum(leds, NUM_LEDS, chanceOfGlitter);
     
   }
+  else if(patternSelection==5) {
+    uint8_t gHue = 200; //"base color"
+    uint16_t deltaT_ms = 20;    
+    confettiLum(leds,NUM_LEDS,gHue,deltaT_ms);
+    
+  }
+  else if(patternSelection==6) {
+    uint8_t beatsPerMinute = 60;
+    uint8_t gHue = 75; //"base color"
+    bpmLum(leds,NUM_LEDS,beatsPerMinute,gHue);
+    
+  }
   else {
+    allOff(leds,NUM_LEDS);
     
   }
 

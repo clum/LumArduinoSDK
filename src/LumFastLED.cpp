@@ -2,6 +2,19 @@
 #include "FastLED.h"
 
 /// <summary>
+/// Turn off all LEDs
+/// </summary>
+/// <param name="leds"></param>
+/// <param name="numLEDs"></param>
+void allOff(CRGB* leds, int numLEDs)
+{
+    //turn off all LEDs
+    for (int k = 0; k < numLEDs; k++) {
+        leds[k] = CRGB(0, 0, 0);        
+    }
+}
+
+/// <summary>
 /// Generate LED pattern of a rising bar.
 /// 
 /// Example usage:
@@ -16,7 +29,7 @@ void rise(CRGB* leds, int numLEDs, CRGB color, uint16_t deltaT_ms)
     static uint16_t sLastMillis = 0;
     static unsigned int numLit = 0;
 
-    //how much time has elapsed since we last lit and LED?
+    //how much time has elapsed since we last lit an LED?
     uint16_t ms = millis();
     uint16_t delta_ms = ms - sLastMillis;
 
@@ -55,7 +68,7 @@ void fall(CRGB* leds, int numLEDs, CRGB color, uint16_t deltaT_ms)
     static uint16_t sLastMillis = 0;
     static unsigned int numLit = 0;
 
-    //how much time has elapsed since we last lit and LED?
+    //how much time has elapsed since we last lit an LED?
     uint16_t ms = millis();
     uint16_t delta_ms = ms - sLastMillis;
 
@@ -95,7 +108,7 @@ void riseAndFall(CRGB* leds, int numLEDs, CRGB color, uint16_t deltaT_ms)
     static unsigned int numLit = 0;
     static bool directionRise = 1;
 
-    //how much time has elapsed since we last lit and LED?
+    //how much time has elapsed since we last lit an LED?
     uint16_t ms = millis();
     uint16_t delta_ms = ms - sLastMillis;
 
@@ -186,7 +199,7 @@ void rainbowLum(CRGB* leds, int numLEDs)
 }
 
 /// <summary>
-/// 
+/// Similar to rainbowLum but add sparkling glitter effects
 /// </summary>
 /// <param name="leds"></param>
 /// <param name="numLEDs"></param>
@@ -195,6 +208,61 @@ void rainbowWithGlitterLum(CRGB* leds, int numLEDs, fract8 chanceOfGlitter)
 {
     rainbowLum(leds, numLEDs);
     addGlitter(leds, numLEDs, chanceOfGlitter);
+}
+
+/// <summary>
+/// random colored speckles that blink in and fade smoothly
+/// </summary>
+/// <param name="leds"></param>
+/// <param name="numLEDs"></param>
+/// <param name="gHue"></param>
+/// <param name="deltaT_ms"></param>
+void confettiLum(CRGB* leds, int numLEDs, uint8_t gHue, uint16_t deltaT_ms)
+{
+    //function options
+    uint8_t fadeBy = 10;
+
+    //static variables
+    static uint16_t sLastMillis = 0;
+
+    //how much time has elapsed since we last updated an LED?
+    uint16_t ms = millis();
+    uint16_t delta_ms = ms - sLastMillis;
+
+    //is it time to light another LED?
+    if (delta_ms > deltaT_ms) {
+        /*
+        From colorutils.h
+        // fadeToBlackBy and fade_raw - reduce the brightness of an array
+        //                              of pixels all at once.  These
+        //                              functions will eventually fade all
+        //                              the way to black.
+        //                              (The two names are synonyms.)
+        void fadeToBlackBy( CRGB* leds, uint16_t num_leds, uint8_t fadeBy);
+         */
+        fadeToBlackBy(leds, numLEDs, fadeBy);
+        int pos = random16(numLEDs);
+        leds[pos] += CHSV(gHue + random8(64), 200, 255);
+
+        sLastMillis = ms;
+    }
+}
+
+/// <summary>
+/// Colored stripes pulsing at a defined Beats-Per-Minute (BPM)
+/// </summary>
+/// <param name="leds"></param>
+/// <param name="numLEDs"></param>
+/// <param name="beatsPerMinute"></param>
+/// <param name="gHue"></param>
+void bpmLum(CRGB* leds, int numLEDs, uint8_t beatsPerMinute, uint8_t gHue)
+{
+    // colored stripes pulsing at a defined Beats-Per-Minute (BPM)
+    CRGBPalette16 palette = PartyColors_p;
+    uint8_t beat = beatsin8(beatsPerMinute, 64, 255);
+    for (int i = 0; i < numLEDs; i++) {
+        leds[i] = ColorFromPalette(palette, gHue + (i * 2), beat - gHue + (i * 10));
+    }
 }
 
 /// <summary>
