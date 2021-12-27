@@ -5,7 +5,8 @@ Christopher Lum
 lum@uw.edu
 
 Version History
-12/24/21: created
+12/24/21: Created, did not appear to work with a certain microSDHC card
+12/26/21: Tried with another microSDHC card (32 GB) and it seemed to work.  This card was formatted using Windows.
 */
 
 // include the SD library:
@@ -30,7 +31,6 @@ void setup() {
   while (!Serial) {
     ; // wait for serial port to connect. Needed for native USB port only
   }
-
 
   Serial.print("\nInitializing SD card...");
 

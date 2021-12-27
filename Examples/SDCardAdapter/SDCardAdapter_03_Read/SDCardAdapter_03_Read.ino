@@ -1,7 +1,7 @@
 /*
 Simple example to show how to interface with the micro SD card adapter.
 
-This writes (appends to a file).
+This reads from a file.
 
 See https://learn.adafruit.com/adafruit-micro-sd-breakout-board-card-tutorial/introduction for more information.
 
@@ -32,18 +32,17 @@ void setup()
   }
   Serial.println("initialization done.");
  
-  // open the file. note that only one file can be open at a time,
-  // so you have to close this one before opening another.
-  myFile = SD.open("test.txt", FILE_WRITE);
- 
-  // if the file opened okay, write to it:
+  // open the file for reading:
+  myFile = SD.open("test.txt");
   if (myFile) {
-    Serial.print("Writing (appending) to test.txt...");
-    myFile.println("testing 1, 2, 3.");
-    
+    Serial.println("test.txt:");
+ 
+    // read from the file until there's nothing else in it:
+    while (myFile.available()) {
+      Serial.write(myFile.read());
+    }
     // close the file:
     myFile.close();
-    Serial.println("done.");
   } else {
     // if the file didn't open, print an error:
     Serial.println("error opening test.txt");
