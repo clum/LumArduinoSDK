@@ -10,6 +10,7 @@ lum@uw.edu
 
 Version History
 12/26/21: created
+12/27/21: Adding writing during the loop portion
 */
 
 #include <SD.h>
@@ -52,5 +53,24 @@ void setup()
  
 void loop()
 {
-  // nothing happens after setup
+  myFile = SD.open("test.txt", FILE_WRITE);
+
+  uint16_t t_ms = millis();
+  
+  // if the file opened okay, write to it:
+  if (myFile) {
+    Serial.println("Inside loop: writing to test.txt.  t_ms = "+(String)t_ms);
+    
+    myFile.println((String)t_ms);
+    
+    // close the file:
+    myFile.close();
+    Serial.println("closed file.");
+    
+  } else {
+    // if the file didn't open, print an error:
+    Serial.println("error opening test.txt");
+  }
+  
+  delay(500);
 }
