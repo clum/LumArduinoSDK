@@ -3,6 +3,7 @@
 
 #Version History
 #12/12/21: Created
+#03/23/22: Adding MS Office
 
 # Prerequisites
 *.d
@@ -36,6 +37,29 @@
 *.exe
 *.out
 *.app
+
+#----------------------------
+#Microsoft Office
+#----------------------------
+*.tmp
+
+# Word temporary
+~$*.doc*
+
+# Word Auto Backup File
+Backup of *.doc*
+
+# Excel temporary
+~$*.xls*
+
+# Excel Backup File
+*.xlk
+
+# PowerPoint temporary
+~$*.ppt*
+
+# Visio autosave temporary files
+*.~vsd*
 
 #--------------------------------------------------------------------------
 # From https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
