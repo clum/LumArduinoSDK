@@ -1,11 +1,14 @@
 /*
 Control two external LED and make it blink using digitalWrite.
 
+Note that each LED should be in series with a current limiting resistor (500 - 1000 ohms).
+
 Christopher Lum
 lum@uw.edu
 
 Version History
 12/04/21: created
+04/28/22: Added note about current limiting resistor
 */
 
 //Constants
