@@ -1,7 +1,10 @@
 /*
 Control two external LED and make it blink using digitalWrite.
 
-Note that each LED should be in series with a current limiting resistor (500 - 1000 ohms).
+Notes:
+  -Each LED should be in series with a current limiting resistor (500 - 1000 ohms).
+  -LED should have long leg to pin and short leg closer to ground.
+  -Arduino Nano built in LED is on pin D13 (or use LED_BUILTIN)
 
 Christopher Lum
 lum@uw.edu
@@ -9,6 +12,7 @@ lum@uw.edu
 Version History
 12/04/21: created
 04/28/22: Added note about current limiting resistor
+09/10/24: Added note about LED directionality and changed blink duration to differentiate between LEDs
 */
 
 //Constants
@@ -28,7 +32,7 @@ void setup() {
 // the loop function runs over and over again forever
 void loop() {
   digitalWrite(PinLED_R,HIGH);
-  delay(300);
+  delay(1000);
   digitalWrite(PinLED_R,LOW);
   delay(300);
 
