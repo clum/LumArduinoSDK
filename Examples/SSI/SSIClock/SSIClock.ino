@@ -14,8 +14,8 @@ Version History
 */
 
 //Constants
-int PinLED_R = A4;
-int PinLED_G = A5;
+int PinLED_R = 7;
+int PinLED_G = 8;
 
 // the setup function runs once when you press reset or power the board
 void setup() {
@@ -30,12 +30,12 @@ void setup() {
 // the loop function runs over and over again forever
 void loop() {
   digitalWrite(PinLED_R,HIGH);
-  delay(1000);
+  delay(500);
   digitalWrite(PinLED_R,LOW);
-  delay(300);
+  delay(100);
 
   digitalWrite(PinLED_G,HIGH);
-  delay(300);
+  delay(100);
   digitalWrite(PinLED_G,LOW);
-  delay(300);
+  delay(100);
 }
