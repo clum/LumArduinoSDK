@@ -14,8 +14,8 @@ Version History
 */
 
 //Constants
-int PinLED_R = 7;
-int PinLED_G = 8;
+int PinCs = 7;      //chip select
+int PinClk = 8;     //clock
 
 // the setup function runs once when you press reset or power the board
 void setup() {
@@ -23,19 +23,52 @@ void setup() {
   Serial.begin(9600);
   
   //LED
-  pinMode(PinLED_R,OUTPUT);
-  pinMode(PinLED_G,OUTPUT);
+  pinMode(PinCs,OUTPUT);
+  pinMode(PinClk,OUTPUT);
+
+  //setup IC
+  digitalWrite(PinCs,HIGH);
+  digitalWrite(PinClk,HIGH);
 }
 
 // the loop function runs over and over again forever
 void loop() {
-  digitalWrite(PinLED_R,HIGH);
+  /*
+  digitalWrite(PinCs,HIGH);
   delay(500);
-  digitalWrite(PinLED_R,LOW);
+  digitalWrite(PinCs,LOW);
   delay(100);
 
-  digitalWrite(PinLED_G,HIGH);
+  digitalWrite(PinClk,HIGH);
   delay(100);
-  digitalWrite(PinLED_G,LOW);
+  digitalWrite(PinClk,LOW);
   delay(100);
+  */
+  readSensor();
+  delay(1000);
+}
+
+unsigned int readSensor() {
+  unsigned int dataOut = 0;
+
+  digitalWrite(PinCs,LOW);
+
+  //Pulse clock and get bits
+  for(int k=0;k<12;k++) {
+    digitalWrite(PinClk,LOW);
+    delay(100);
+    digitalWrite(PinClk,HIGH);
+    delay(100);
+  }
+
+  //deselect encoder from reading
+  digitalWrite(PinCs,HIGH);
+  
+  return dataOut;
+}
+
+unsigned long FrequencyToPeriodMs() {
+  //ERROR: START HERE!!!
+  return 0;
+
 }
