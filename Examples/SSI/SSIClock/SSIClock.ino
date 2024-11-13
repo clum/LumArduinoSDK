@@ -45,7 +45,7 @@ void loop() {
   delay(100);
   */
   readSensor();
-  delay(1000);
+  //delay(1000);
 }
 
 unsigned int readSensor() {
@@ -56,9 +56,9 @@ unsigned int readSensor() {
   //Pulse clock and get bits
   for(int k=0;k<12;k++) {
     digitalWrite(PinClk,LOW);
-    delay(100);
+    delay(1);
     digitalWrite(PinClk,HIGH);
-    delay(100);
+    delay(1);
   }
 
   //deselect encoder from reading
@@ -67,7 +67,11 @@ unsigned int readSensor() {
   return dataOut;
 }
 
-unsigned long FrequencyToPeriodMs() {
+
+/*
+
+ */
+unsigned long FrequencyToPeriodMs(unsigned int fHz) {
   //ERROR: START HERE!!!
   return 0;
 

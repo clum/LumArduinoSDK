@@ -1,0 +1,261 @@
+(* Content-type: application/mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 6.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       145,          7]
+NotebookDataLength[      9508,        253]
+NotebookOptionsPosition[      6421,        177]
+NotebookOutlinePosition[      8076,        231]
+CellTagsIndexPosition[      8033,        228]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell["\<\
+Christopher Lum
+lum@uw.edu\
+\>", "Text",
+ CellChangeTimes->{
+  3.462635396373103*^9, {3.493485404421875*^9, 3.493485411171875*^9}, {
+   3.7026362869393644`*^9, 
+   3.7026362871776953`*^9}},ExpressionUUID->"01ba3b3b-45e0-459b-9de3-\
+e99f8931bdac"],
+
+Cell[CellGroupData[{
+
+Cell["Timing", "Title",
+ CellChangeTimes->{{3.5820256382031593`*^9, 3.582025639685162*^9}, {
+   3.584541660637144*^9, 3.584541661597145*^9}, {3.637347875304098*^9, 
+   3.6373478756634817`*^9}, {3.6375468009768205`*^9, 3.6375468092169933`*^9}, 
+   3.7002732053311734`*^9, {3.757331764470025*^9, 3.757331764541798*^9}, {
+   3.791751609032254*^9, 3.791751609810954*^9}, {3.792358213579256*^9, 
+   3.7923582163012342`*^9}, {3.7950540301892586`*^9, 3.795054033092576*^9}, {
+   3.8509137075569563`*^9, 3.8509137076332054`*^9}, {3.9405041066700125`*^9, 
+   3.9405041074139194`*^9}},
+ TextAlignment->Center,
+ FontSize->24,ExpressionUUID->"90e4f73d-5548-4ca6-9edc-e4e23cb88ce7"],
+
+Cell[CellGroupData[{
+
+Cell["Outline", "Section",
+ CellChangeTimes->{{3.5820256382031593`*^9, 3.582025639685162*^9}, {
+  3.5845416731171618`*^9, 3.5845416736521626`*^9}},
+ FontSize->24,ExpressionUUID->"a4d0c74a-d3f6-4c57-b283-39ce55fbe4bb"],
+
+Cell["These functions are used for timing and clock functionality.", "Text",
+ CellChangeTimes->{{3.43186635940625*^9, 3.431866361921875*^9}, {
+   3.5275359699662685`*^9, 3.527535988207312*^9}, {3.527536626371813*^9, 
+   3.5275366413116674`*^9}, {3.6375468144270215`*^9, 
+   3.6375468388325577`*^9}, {3.637547076522852*^9, 3.637547081943305*^9}, {
+   3.6375474437538395`*^9, 3.6375474453849044`*^9}, {3.6375475089806395`*^9, 
+   3.637547510124241*^9}, {3.6375475843269205`*^9, 3.6375475852892895`*^9}, 
+   3.7002732087326965`*^9, {3.792358218840906*^9, 3.7923582290204678`*^9}, {
+   3.9122143081250305`*^9, 3.91221431102155*^9}, {3.9405041589178514`*^9, 
+   3.940504159350362*^9}, {3.9405064886379533`*^9, 
+   3.940506505621155*^9}},ExpressionUUID->"5e363e7a-19e3-4854-a757-\
+121ba2ac3dfd"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["FrequencyToPeriod", "Section",
+ CellChangeTimes->{{3.5820256382031593`*^9, 3.582025639685162*^9}, {
+  3.584547499170659*^9, 3.584547501475662*^9}, {3.6375460483336945`*^9, 
+  3.6375460499186296`*^9}, {3.6375474384157553`*^9, 3.637547440190829*^9}, {
+  3.7923583998115835`*^9, 3.792358400289258*^9}, {3.9405084446475763`*^9, 
+  3.9405084478127356`*^9}},
+ FontSize->24,ExpressionUUID->"a356bed0-208f-4ea1-a9fe-cb6fbeda26ed"],
+
+Cell[TextData[{
+ "Given the frequency, compute the period\n\n\t",
+ Cell[BoxData[
+  FormBox[
+   RowBox[{
+    SubscriptBox["f", "hz"], "=", 
+    FractionBox["1", "T"]}], TraditionalForm]],
+  FormatType->TraditionalForm,ExpressionUUID->
+  "1a88995e-d7c9-4ba0-a06f-3e2d17202405"],
+ "\n\t\n\t",
+ Cell[BoxData[
+  FormBox[
+   RowBox[{"T", "=", 
+    FractionBox["1", 
+     SubscriptBox["f", "hz"]]}], TraditionalForm]],
+  FormatType->TraditionalForm,ExpressionUUID->
+  "daedc474-9496-48b8-8e77-477e569abaf9"]
+}], "Text",
+ CellChangeTimes->{{3.7923585526067843`*^9, 3.792358556368473*^9}, {
+  3.940508436965413*^9, 3.94050846421802*^9}, {3.9405087261091595`*^9, 
+  3.94050873090301*^9}, {3.940509367237191*^9, 
+  3.9405093679738626`*^9}},ExpressionUUID->"460f16f7-0d5c-4dd7-9072-\
+1cf7a46745a1"],
+
+Cell[TextData[{
+ "If we obtain the period in milliseconds we can multiply by 1000\n\n\t",
+ Cell[BoxData[
+  FormBox[
+   RowBox[{
+    SubscriptBox["T", "ms"], "=", 
+    RowBox[{"1000", "T"}]}], TraditionalForm]],
+  FormatType->TraditionalForm,ExpressionUUID->
+  "9abe8ad5-2ba4-47e6-a900-7266136d13f6"]
+}], "Text",
+ CellChangeTimes->{{3.940509370290656*^9, 3.9405093808500977`*^9}, {
+  3.9405094166286864`*^9, 
+  3.940509428549901*^9}},ExpressionUUID->"8cf1826a-0571-4f48-89e3-\
+2ca8c027ed42"],
+
+Cell[BoxData[
+ RowBox[{"fHz", "=", "20"}]], "Input",
+ CellChangeTimes->{{3.9405094381237183`*^9, 
+  3.9405094436464944`*^9}},ExpressionUUID->"fd4c495e-95c9-4c43-a511-\
+742275915ab5"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["PeriodToFrequency", "Section",
+ CellChangeTimes->{{3.5820256382031593`*^9, 3.582025639685162*^9}, {
+  3.584547499170659*^9, 3.584547501475662*^9}, {3.6375460483336945`*^9, 
+  3.6375460499186296`*^9}, {3.6375474384157553`*^9, 3.637547440190829*^9}, {
+  3.7923583998115835`*^9, 3.792358400289258*^9}, {3.9405084446475763`*^9, 
+  3.9405084478127356`*^9}, {3.940510720301529*^9, 3.9405107226287255`*^9}},
+ FontSize->24,ExpressionUUID->"8703a979-a2d5-4c4c-aadf-d638b2a334f6"],
+
+Cell[TextData[{
+ "Given the period, compute the frequency\n\n\t",
+ Cell[BoxData[
+  FormBox[
+   RowBox[{
+    SubscriptBox["f", "hz"], "=", 
+    FractionBox["1", "T"]}], TraditionalForm]],
+  FormatType->TraditionalForm,ExpressionUUID->
+  "b4852ef2-a0ab-4fa9-b576-b6245311345d"]
+}], "Text",
+ CellChangeTimes->{{3.9405109156992054`*^9, 
+  3.940510931437927*^9}},ExpressionUUID->"508f667f-d748-44ba-8127-\
+24102ffb60d1"],
+
+Cell["Consider an Arduino with a minimum delay", "Text",
+ CellChangeTimes->{{3.940511003724346*^9, 
+  3.9405110447166224`*^9}},ExpressionUUID->"7422892f-7d29-4370-a746-\
+8b7edd20cf94"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{"T", "=", 
+  RowBox[{"1", "/", "1000"}]}], "\[IndentingNewLine]", 
+ RowBox[{"fHz", "=", 
+  FractionBox["1", "T"]}]}], "Input",
+ CellChangeTimes->{{3.9405109336425076`*^9, 3.9405109419991803`*^9}},
+ CellLabel->"In[1]:=",ExpressionUUID->"e792beaf-9310-45f4-9a20-a14ed22d31e5"],
+
+Cell[BoxData[
+ FractionBox["1", "1000"]], "Output",
+ CellChangeTimes->{3.9405109437917476`*^9},
+ CellLabel->"Out[1]=",ExpressionUUID->"6c80c4a5-5045-4ad2-886a-f2f32c35e23d"],
+
+Cell[BoxData["1000"], "Output",
+ CellChangeTimes->{3.9405109437977467`*^9},
+ CellLabel->"Out[2]=",ExpressionUUID->"a6a6e8ea-f644-4468-abe3-b8032f1abd3d"]
+}, Open  ]],
+
+Cell["", "Text",
+ CellChangeTimes->{{3.9405109860666757`*^9, 
+  3.940510988444927*^9}},ExpressionUUID->"980c491a-8d1b-42e7-9330-\
+d42febcc7797"]
+}, Open  ]]
+}, Open  ]]
+},
+WindowToolbars->{},
+WindowSize->{1920, 1157},
+WindowMargins->{{-156, Automatic}, {Automatic, -1208}},
+PrintingCopies->1,
+PrintingStartingPageNumber->1,
+PrintingPageRange->{32000, 32000},
+PageHeaders->{{
+   Cell[
+    TextData[{
+      StyleBox[
+       CounterBox["Page"], "PageNumber"], " ", "|", " ", 
+      StyleBox[
+       ValueBox["FileName"], "Header"]}], "Header", 
+    CellMargins -> {{0, Inherited}, {Inherited, Inherited}}], None, None}, {
+  None, None, 
+   Cell[
+    TextData[{
+      StyleBox[
+       ValueBox["FileName"], "Header"], " ", "|", " ", 
+      StyleBox[
+       CounterBox["Page"], "PageNumber"]}], "Header", 
+    CellMargins -> {{Inherited, 0}, {Inherited, Inherited}}]}},
+PageFooters->{{None, None, None}, {
+   Cell[
+    TextData["LumArduinoSDK"], "Footer", 
+    CellMargins -> {{0, Inherited}, {Inherited, Inherited}}], None, 
+   Cell[
+    TextData[{"Christopher", " ", "Lum"}], "Footer", 
+    CellMargins -> {{Inherited, 0}, {Inherited, Inherited}}]}},
+PageHeaderLines->{False, False},
+PageFooterLines->{False, True},
+PrintingOptions->{"FacingPages"->False,
+"FirstPageFace"->Right,
+"FirstPageFooter"->True,
+"FirstPageHeader"->True,
+"Magnification"->1.,
+"PaperOrientation"->"Portrait",
+"PaperSize"->{612, 792}},
+PrivateNotebookOptions->{"VersionedStylesheet"->{"Default.nb"[8.] -> False}},
+Magnification->1.25,
+FrontEndVersion->"12.3 for Microsoft Windows (64-bit) (July 9, 2021)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"51989f71-fa92-48c1-8b93-b1a8b5eb0ad6"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[545, 20, 256, 8, 73, "Text",ExpressionUUID->"01ba3b3b-45e0-459b-9de3-e99f8931bdac"],
+Cell[CellGroupData[{
+Cell[826, 32, 669, 10, 90, "Title",ExpressionUUID->"90e4f73d-5548-4ca6-9edc-e4e23cb88ce7"],
+Cell[CellGroupData[{
+Cell[1520, 46, 217, 3, 78, "Section",ExpressionUUID->"a4d0c74a-d3f6-4c57-b283-39ce55fbe4bb"],
+Cell[1740, 51, 789, 11, 44, "Text",ExpressionUUID->"5e363e7a-19e3-4854-a757-121ba2ac3dfd"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[2566, 67, 428, 6, 78, "Section",ExpressionUUID->"a356bed0-208f-4ea1-a9fe-cb6fbeda26ed"],
+Cell[2997, 75, 786, 22, 170, "Text",ExpressionUUID->"460f16f7-0d5c-4dd7-9072-1cf7a46745a1"],
+Cell[3786, 99, 490, 13, 102, "Text",ExpressionUUID->"8cf1826a-0571-4f48-89e3-2ca8c027ed42"],
+Cell[4279, 114, 182, 4, 36, "Input",ExpressionUUID->"fd4c495e-95c9-4c43-a511-742275915ab5"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[4498, 123, 476, 6, 78, "Section",ExpressionUUID->"8703a979-a2d5-4c4c-aadf-d638b2a334f6"],
+Cell[4977, 131, 415, 12, 106, "Text",ExpressionUUID->"508f667f-d748-44ba-8127-24102ffb60d1"],
+Cell[5395, 145, 184, 3, 44, "Text",ExpressionUUID->"7422892f-7d29-4370-a746-8b7edd20cf94"],
+Cell[CellGroupData[{
+Cell[5604, 152, 298, 6, 82, "Input",ExpressionUUID->"e792beaf-9310-45f4-9a20-a14ed22d31e5"],
+Cell[5905, 160, 173, 3, 59, "Output",ExpressionUUID->"6c80c4a5-5045-4ad2-886a-f2f32c35e23d"],
+Cell[6081, 165, 153, 2, 41, "Output",ExpressionUUID->"a6a6e8ea-f644-4468-abe3-b8032f1abd3d"]
+}, Open  ]],
+Cell[6249, 170, 144, 3, 44, "Text",ExpressionUUID->"980c491a-8d1b-42e7-9330-d42febcc7797"]
+}, Open  ]]
+}, Open  ]]
+}
+]
+*)
+
