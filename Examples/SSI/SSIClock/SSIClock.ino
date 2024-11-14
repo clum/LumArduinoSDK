@@ -11,6 +11,7 @@ lum@uw.edu
 
 Version History
 11/11/24: created
+11/13/24: Updated
 */
 
 //Constants
@@ -56,9 +57,11 @@ unsigned int readSensor() {
   //Pulse clock and get bits
   for(int k=0;k<12;k++) {
     digitalWrite(PinClk,LOW);
-    delay(1);
+    //delay(1);
+    delayMicroseconds(1); 
     digitalWrite(PinClk,HIGH);
-    delay(1);
+    delayMicroseconds(1);     
+    //delay(1);
   }
 
   //deselect encoder from reading
