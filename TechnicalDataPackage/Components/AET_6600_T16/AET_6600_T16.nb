@@ -1,0 +1,495 @@
+(* Content-type: application/mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 6.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       145,          7]
+NotebookDataLength[     18159,        487]
+NotebookOptionsPosition[     12154,        364]
+NotebookOutlinePosition[     13809,        418]
+CellTagsIndexPosition[     13766,        415]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell["\<\
+Christopher Lum
+lum@uw.edu\
+\>", "Text",
+ CellChangeTimes->{
+  3.462635396373103*^9, {3.493485404421875*^9, 3.493485411171875*^9}, {
+   3.7026362869393644`*^9, 
+   3.7026362871776953`*^9}},ExpressionUUID->"01ba3b3b-45e0-459b-9de3-\
+e99f8931bdac"],
+
+Cell["\<\
+Version History
+11/13/24: Created\
+\>", "Text",
+ CellChangeTimes->{{3.94052071268246*^9, 
+  3.9405207186540413`*^9}},ExpressionUUID->"241c75fc-6aa9-4fe1-94c8-\
+197121cff669"],
+
+Cell[CellGroupData[{
+
+Cell["AET-6600-T16", "Title",
+ CellChangeTimes->{{3.5820256382031593`*^9, 3.582025639685162*^9}, {
+   3.584541660637144*^9, 3.584541661597145*^9}, {3.637347875304098*^9, 
+   3.6373478756634817`*^9}, {3.6375468009768205`*^9, 3.6375468092169933`*^9}, 
+   3.7002732053311734`*^9, {3.757331764470025*^9, 3.757331764541798*^9}, {
+   3.791751609032254*^9, 3.791751609810954*^9}, {3.792358213579256*^9, 
+   3.7923582163012342`*^9}, {3.7950540301892586`*^9, 3.795054033092576*^9}, {
+   3.8509137075569563`*^9, 3.8509137076332054`*^9}, {3.9405041066700125`*^9, 
+   3.9405041074139194`*^9}, {3.94052070669839*^9, 3.940520711256816*^9}},
+ TextAlignment->Center,
+ FontSize->24,ExpressionUUID->"90e4f73d-5548-4ca6-9edc-e4e23cb88ce7"],
+
+Cell[CellGroupData[{
+
+Cell["\<\
+Application Notes 5501 (av02-2791en_an_5501_aeat-6600_2014-04-21.pdf)\
+\>", "Chapter",
+ CellChangeTimes->{{3.9405304386041555`*^9, 3.940530445335807*^9}, {
+  3.9405531024486265`*^9, 
+  3.940553103465481*^9}},ExpressionUUID->"9db6ab18-255c-42a3-9b7f-\
+076918bf1230"],
+
+Cell[CellGroupData[{
+
+Cell["Description", "Section",
+ CellChangeTimes->{{3.5820256382031593`*^9, 3.582025639685162*^9}, {
+  3.5845416731171618`*^9, 3.5845416736521626`*^9}, {3.9405207606878843`*^9, 
+  3.940520761854411*^9}},
+ FontSize->24,ExpressionUUID->"a4d0c74a-d3f6-4c57-b283-39ce55fbe4bb"],
+
+Cell["\<\
+up to 16 bits of resolution
+simultaneous incremental output of up to 1024 CPR.
+
+Output signals are available in three different forms:
+\t     1. PWM
+\t\[DoubleRightArrow] 2. 16-bit absolute position through SSI
+\t    3. incremental output with 10 bits of resolution\
+\>", "Text",
+ CellChangeTimes->{{3.43186635940625*^9, 3.431866361921875*^9}, {
+   3.5275359699662685`*^9, 3.527535988207312*^9}, {3.527536626371813*^9, 
+   3.5275366413116674`*^9}, {3.6375468144270215`*^9, 
+   3.6375468388325577`*^9}, {3.637547076522852*^9, 3.637547081943305*^9}, {
+   3.6375474437538395`*^9, 3.6375474453849044`*^9}, {3.6375475089806395`*^9, 
+   3.637547510124241*^9}, {3.6375475843269205`*^9, 3.6375475852892895`*^9}, 
+   3.7002732087326965`*^9, {3.792358218840906*^9, 3.7923582290204678`*^9}, {
+   3.9122143081250305`*^9, 3.91221431102155*^9}, {3.9405041589178514`*^9, 
+   3.940504159350362*^9}, {3.9405064886379533`*^9, 3.940506505621155*^9}, {
+   3.940520764566775*^9, 
+   3.94052086068289*^9}},ExpressionUUID->"5e363e7a-19e3-4854-a757-\
+121ba2ac3dfd"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ SuperscriptBox["2", "10"]], "Input",
+ CellChangeTimes->{{3.94052082842847*^9, 3.9405208296108847`*^9}},
+ CellLabel->"In[1]:=",ExpressionUUID->"83732b1f-721f-48cf-bba2-1b89afe7c07a"],
+
+Cell[BoxData["1024"], "Output",
+ CellChangeTimes->{3.940520829971651*^9},
+ CellLabel->"Out[1]=",ExpressionUUID->"e37c5b58-d450-4ebe-8813-122b529bfbb6"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["1.0 Operation Mode", "Section",
+ CellChangeTimes->{{3.9405212395164237`*^9, 3.9405212412535143`*^9}, {
+  3.9405220956550198`*^9, 
+  3.940522096081914*^9}},ExpressionUUID->"049d7421-8517-4721-8dbf-\
+7c6cb7815c70"],
+
+Cell["\<\
+4 types of operational modes
+
+\t1. Normal operation mode
+\t2. One time programming (OTP) mode
+\t3. Alignment mode
+\t4. Power down mode\
+\>", "Text",
+ CellChangeTimes->{{3.940521251103895*^9, 
+  3.940521280094018*^9}},ExpressionUUID->"6d1f779e-b801-43d6-9b69-\
+e02feb5aa8c4"],
+
+Cell[CellGroupData[{
+
+Cell["1.1 Normal Operation Mode", "Subsection",
+ CellChangeTimes->{
+  3.9405211909320416`*^9, {3.94052124298713*^9, 3.940521249726263*^9}, {
+   3.9405221034545126`*^9, 
+   3.9405221039992957`*^9}},ExpressionUUID->"dd503db9-cc9c-4450-b0d4-\
+9bba4c5c749b"],
+
+Cell["\<\
+Absolute output (10, 12, 14, or 16-bit absolute position data) is available \
+through SSI pins (DO, CLK, and NCS pins)
+
+PWN is off by default
+Incremental outputs are off
+A/B/I and UVW are off
+Output MAG_HI and MAG_LO are on to determine the presence and strength of the \
+magnet.\
+\>", "Text",
+ CellChangeTimes->{{3.9405212298406916`*^9, 3.94052123103511*^9}, {
+  3.9405212853345127`*^9, 3.9405213654863515`*^9}, {3.9405218292080207`*^9, 
+  3.9405218294988003`*^9}},ExpressionUUID->"81065b6f-2a6b-44c4-9e6a-\
+ab1ba3466939"],
+
+Cell["\<\
+Default settings:\[LineSeparator]\t-absolute resolution is at 10 bit
+\t-zero position is not programmed
+\t-direction is counter-clock wise operation
+\t-incremental mode is disabled
+\t-speed mode is set at slow mode\
+\>", "Text",
+ CellChangeTimes->{{3.9405218302957783`*^9, 
+  3.9405219077565002`*^9}},ExpressionUUID->"9409e9e2-3a68-4053-8449-\
+f243aaf06f68"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["1.2 OTP Programming Mode", "Subsection",
+ CellChangeTimes->{
+  3.9405211909320416`*^9, {3.94052124298713*^9, 3.940521249726263*^9}, {
+   3.940521813546273*^9, 3.940521813704328*^9}, {3.9405221082559137`*^9, 
+   3.9405221129676104`*^9}, {3.9405221776405864`*^9, 
+   3.940522178346281*^9}},ExpressionUUID->"fc0c9085-6ccd-41a2-b925-\
+97138ea5468c"],
+
+Cell["OTP is used to program settings", "Text",
+ CellChangeTimes->{{3.940522171979982*^9, 
+  3.9405221833871136`*^9}},ExpressionUUID->"117119f4-deba-4407-9c3c-\
+b807b34cb07a"],
+
+Cell["1.2.1  Absolute and Incremental Programming", "Subsubsection",
+ CellChangeTimes->{{3.9405218166006794`*^9, 3.940521818153776*^9}, {
+  3.9405221226478715`*^9, 
+  3.940522130871848*^9}},ExpressionUUID->"3fec5667-1b7f-4a43-8027-\
+7b797e447b0e"],
+
+Cell["1.2.2 Zero Position Programming", "Subsubsection",
+ CellChangeTimes->{{3.9405221213660746`*^9, 
+  3.9405221460722775`*^9}},ExpressionUUID->"6d6e50f7-3c9f-4601-9391-\
+f59989cc90b2"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["1.3 Alignment Mode", "Subsection",
+ CellChangeTimes->{{3.940522153940899*^9, 
+  3.9405221604018793`*^9}},ExpressionUUID->"e65dee28-4973-4cc3-aefc-\
+4dd670ddc3a3"],
+
+Cell["\<\
+Alignment mode is used for monitoring the placement of the hall sensors to \
+the center of the magnet rotation axis.\
+\>", "Text",
+ CellChangeTimes->{{3.9405221659786234`*^9, 3.9405221974741917`*^9}, {
+  3.940522314942143*^9, 
+  3.9405223174594607`*^9}},ExpressionUUID->"fa6b7ea6-7e94-49fc-b97f-\
+f65773ebdfad"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["1.4 Power Down Mode", "Subsection",
+ CellChangeTimes->{{3.940522321050744*^9, 
+  3.940522329809655*^9}},ExpressionUUID->"633f515d-1321-4755-a888-\
+d4e7a2da1560"],
+
+Cell["Useful power saving feature.", "Text",
+ CellChangeTimes->{{3.9405223307787666`*^9, 
+  3.9405223381387143`*^9}},ExpressionUUID->"29be2ae1-68ff-4798-95ce-\
+565fdd3fa1af"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["2.0 Speed Mode", "Section",
+ CellChangeTimes->{{3.94052235991558*^9, 
+  3.9405223677561665`*^9}},ExpressionUUID->"7d99d9ef-cc96-4a82-ad6a-\
+d143437e6263"],
+
+Cell["\<\
+In 10-bit resolution, maximum motor speed to obtain all positional data in \
+one revolution is 703 rpm (4218 deg/s).\
+\>", "Text",
+ CellChangeTimes->{{3.940523211926886*^9, 
+  3.940523247481636*^9}},ExpressionUUID->"e34ca373-eeb6-4510-8ccd-\
+e99b18b13da7"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["3.0 Accuracy", "Section",
+ CellChangeTimes->{{3.9405232489811077`*^9, 
+  3.9405232517863073`*^9}},ExpressionUUID->"1e004997-1d0c-4a2b-89eb-\
+ecfc84ecaead"],
+
+Cell["3.1 Sensor Accuracy", "Subsection",
+ CellChangeTimes->{{3.940523278213458*^9, 
+  3.9405232824129543`*^9}},ExpressionUUID->"1dafddfa-fee5-48ad-a746-\
+d410605e52d0"],
+
+Cell[CellGroupData[{
+
+Cell["3.2 Temperature Drift", "Subsection",
+ CellChangeTimes->{{3.9405232830935493`*^9, 
+  3.940523287177945*^9}},ExpressionUUID->"ff518daf-9711-4f0b-acc6-\
+ec8a61d8b90b"],
+
+Cell["-40 deg C to +135 deg C yields a drift of 0.005 deg /deg C", "Text",
+ CellChangeTimes->{{3.9405233012401676`*^9, 
+  3.9405233330239553`*^9}},ExpressionUUID->"61f448b8-23d6-411d-bdd6-\
+be87e4e24e26"]
+}, Open  ]]
+}, Open  ]],
+
+Cell["4.0 Recommended Magnet", "Section",
+ CellChangeTimes->{{3.940523336182353*^9, 
+  3.9405233408533506`*^9}},ExpressionUUID->"34c0edda-aa4b-462a-8248-\
+59a238888a6a"],
+
+Cell["5.0 3.3V / 5V Operation", "Section",
+ CellChangeTimes->{{3.9405233589406104`*^9, 
+  3.940523366498926*^9}},ExpressionUUID->"f743bfd9-414a-4d0a-a46c-\
+21f8a8857838"],
+
+Cell["6.0 Reference Design", "Section",
+ CellChangeTimes->{{3.9405304100037603`*^9, 
+  3.940530415087967*^9}},ExpressionUUID->"ec823701-357d-4213-9d23-\
+a151bf280a27"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["\<\
+Data Sheet (AV02-2792EN-Data-Sheet-AEAT-6600-T16-2022-02-23.pdf)\
+\>", "Chapter",
+ CellChangeTimes->{{3.9405304639873466`*^9, 3.940530465153211*^9}, {
+  3.9405530689274635`*^9, 
+  3.940553083129151*^9}},ExpressionUUID->"62eb9baf-fdd1-444d-8fa1-\
+254f03d748e9"],
+
+Cell["Pin Assignments", "Section",
+ CellChangeTimes->{{3.940530468258227*^9, 
+  3.940530484721982*^9}},ExpressionUUID->"01009efc-48cf-4a04-8c17-\
+b5c7a803b617"],
+
+Cell["Pinout Description", "Section",
+ CellChangeTimes->{{3.9405532310403595`*^9, 
+  3.9405532344432974`*^9}},ExpressionUUID->"617f228d-db11-423a-a104-\
+a7dc89a241f6"],
+
+Cell["Magnet and IC Package Placement", "Section",
+ CellChangeTimes->{{3.9405532646929517`*^9, 
+  3.940553270266343*^9}},ExpressionUUID->"33394c82-77cf-430e-a684-\
+349aa9742311"],
+
+Cell["Defined Chip Sensor Center and Magnet Displacement Radius", "Section",
+ CellChangeTimes->{{3.9405532646929517`*^9, 
+  3.9405533012749157`*^9}},ExpressionUUID->"8a014805-5f71-440a-ab5c-\
+8ddf299d8392"],
+
+Cell[CellGroupData[{
+
+Cell["SSI Timing Diagram", "Section",
+ CellChangeTimes->{{3.9405533498789854`*^9, 
+  3.9405533548302956`*^9}},ExpressionUUID->"d4f7bcd1-70f9-4b04-875e-\
+8105982350fb"],
+
+Cell["Timing information", "Text",
+ CellChangeTimes->{{3.940553306206833*^9, 3.9405533188517246`*^9}, {
+  3.940553441366667*^9, 3.9405535036395845`*^9}, {3.9405541737787743`*^9, 
+  3.9405541993788023`*^9}},ExpressionUUID->"60a21937-b46b-4784-8e3d-\
+10cb872be768"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"tTIMEOUTus", "=", "20"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{"tTIMEOUT", "=", 
+  RowBox[{"tTIMEOUTus", "/", 
+   RowBox[{"(", 
+    RowBox[{"1000", "*", "1000"}], ")"}]}]}], "\[IndentingNewLine]", 
+ RowBox[{"f", "=", 
+  RowBox[{"1", "/", "tTIMEOUT"}]}]}], "Input",
+ CellChangeTimes->{
+  3.9405533474090643`*^9, {3.940553610962499*^9, 3.9405536186339855`*^9}, {
+   3.940553940650431*^9, 3.940554003164923*^9}},
+ CellLabel->"In[8]:=",ExpressionUUID->"824b23e7-0cc3-489a-ac6c-b9378a478705"],
+
+Cell[BoxData[
+ FractionBox["1", "50000"]], "Output",
+ CellChangeTimes->{{3.9405539895861154`*^9, 3.940554003416734*^9}},
+ CellLabel->"Out[9]=",ExpressionUUID->"90ac7e3f-4d77-4412-894e-4f68feaa2341"],
+
+Cell[BoxData["50000"], "Output",
+ CellChangeTimes->{{3.9405539895861154`*^9, 3.9405540034207335`*^9}},
+ CellLabel->"Out[10]=",ExpressionUUID->"4c11fb4c-5ca9-43a5-b7f0-493ff1c1b0c9"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]],
+
+Cell["\<\
+AET-6600-T16 Magnetic Encoder Programmer Kit \
+(av02-2803en-ug-aeat-6600-t16-19jan2012.pdf)\
+\>", "Chapter",
+ CellChangeTimes->{{3.940553115041607*^9, 
+  3.9405531461355653`*^9}},ExpressionUUID->"99a35e17-9cdf-483b-b32d-\
+eb2b68429c02"],
+
+Cell["\<\
+Reliability Data Sheet (av02-3001en-rd-aeat-6600-t16-23jun2011.pdf)\
+\>", "Chapter",
+ CellChangeTimes->{{3.9405531723684683`*^9, 
+  3.940553182208946*^9}},ExpressionUUID->"32e4cad8-961e-4eb4-8b6f-\
+242c1781e37b"]
+}, Open  ]]
+},
+WindowToolbars->{},
+WindowSize->{1920, 1157},
+WindowMargins->{{-156, Automatic}, {Automatic, -1208}},
+PrintingCopies->1,
+PrintingStartingPageNumber->1,
+PrintingPageRange->{32000, 32000},
+PageHeaders->{{
+   Cell[
+    TextData[{
+      StyleBox[
+       CounterBox["Page"], "PageNumber"], " ", "|", " ", 
+      StyleBox[
+       ValueBox["FileName"], "Header"]}], "Header", 
+    CellMargins -> {{0, Inherited}, {Inherited, Inherited}}], None, None}, {
+  None, None, 
+   Cell[
+    TextData[{
+      StyleBox[
+       ValueBox["FileName"], "Header"], " ", "|", " ", 
+      StyleBox[
+       CounterBox["Page"], "PageNumber"]}], "Header", 
+    CellMargins -> {{Inherited, 0}, {Inherited, Inherited}}]}},
+PageFooters->{{None, None, None}, {
+   Cell[
+    TextData["LumArduinoSDK"], "Footer", 
+    CellMargins -> {{0, Inherited}, {Inherited, Inherited}}], None, 
+   Cell[
+    TextData[{"Christopher", " ", "Lum"}], "Footer", 
+    CellMargins -> {{Inherited, 0}, {Inherited, Inherited}}]}},
+PageHeaderLines->{False, False},
+PageFooterLines->{False, True},
+PrintingOptions->{"FacingPages"->False,
+"FirstPageFace"->Right,
+"FirstPageFooter"->True,
+"FirstPageHeader"->True,
+"Magnification"->1.,
+"PaperOrientation"->"Portrait",
+"PaperSize"->{612, 792}},
+PrivateNotebookOptions->{"VersionedStylesheet"->{"Default.nb"[8.] -> False}},
+Magnification->1.25,
+FrontEndVersion->"12.3 for Microsoft Windows (64-bit) (July 9, 2021)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"51989f71-fa92-48c1-8b93-b1a8b5eb0ad6"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[545, 20, 256, 8, 73, "Text",ExpressionUUID->"01ba3b3b-45e0-459b-9de3-e99f8931bdac"],
+Cell[804, 30, 184, 6, 73, "Text",ExpressionUUID->"241c75fc-6aa9-4fe1-94c8-197121cff669"],
+Cell[CellGroupData[{
+Cell[1013, 40, 720, 10, 90, "Title",ExpressionUUID->"90e4f73d-5548-4ca6-9edc-e4e23cb88ce7"],
+Cell[CellGroupData[{
+Cell[1758, 54, 275, 6, 86, "Chapter",ExpressionUUID->"9db6ab18-255c-42a3-9b7f-076918bf1230"],
+Cell[CellGroupData[{
+Cell[2058, 64, 272, 4, 78, "Section",ExpressionUUID->"a4d0c74a-d3f6-4c57-b283-39ce55fbe4bb"],
+Cell[2333, 70, 1051, 20, 217, "Text",ExpressionUUID->"5e363e7a-19e3-4854-a757-121ba2ac3dfd"],
+Cell[CellGroupData[{
+Cell[3409, 94, 196, 3, 38, "Input",ExpressionUUID->"83732b1f-721f-48cf-bba2-1b89afe7c07a"],
+Cell[3608, 99, 151, 2, 61, "Output",ExpressionUUID->"e37c5b58-d450-4ebe-8813-122b529bfbb6"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[3808, 107, 218, 4, 84, "Section",ExpressionUUID->"049d7421-8517-4721-8dbf-7c6cb7815c70"],
+Cell[4029, 113, 284, 10, 188, "Text",ExpressionUUID->"6d1f779e-b801-43d6-9b69-e02feb5aa8c4"],
+Cell[CellGroupData[{
+Cell[4338, 127, 254, 5, 67, "Subsection",ExpressionUUID->"dd503db9-cc9c-4450-b0d4-9bba4c5c749b"],
+Cell[4595, 134, 533, 13, 188, "Text",ExpressionUUID->"81065b6f-2a6b-44c4-9e6a-ab1ba3466939"],
+Cell[5131, 149, 368, 9, 188, "Text",ExpressionUUID->"9409e9e2-3a68-4053-8449-f243aaf06f68"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[5536, 163, 351, 6, 67, "Subsection",ExpressionUUID->"fc0c9085-6ccd-41a2-b925-97138ea5468c"],
+Cell[5890, 171, 175, 3, 44, "Text",ExpressionUUID->"117119f4-deba-4407-9c3c-b807b34cb07a"],
+Cell[6068, 176, 247, 4, 56, "Subsubsection",ExpressionUUID->"3fec5667-1b7f-4a43-8027-7b797e447b0e"],
+Cell[6318, 182, 186, 3, 45, "Subsubsection",ExpressionUUID->"6d6e50f7-3c9f-4601-9391-f59989cc90b2"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[6541, 190, 168, 3, 67, "Subsection",ExpressionUUID->"e65dee28-4973-4cc3-aefc-4dd670ddc3a3"],
+Cell[6712, 195, 321, 7, 44, "Text",ExpressionUUID->"fa6b7ea6-7e94-49fc-b97f-f65773ebdfad"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[7070, 207, 167, 3, 67, "Subsection",ExpressionUUID->"633f515d-1321-4755-a888-d4e7a2da1560"],
+Cell[7240, 212, 174, 3, 44, "Text",ExpressionUUID->"29be2ae1-68ff-4798-95ce-565fdd3fa1af"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[7463, 221, 160, 3, 84, "Section",ExpressionUUID->"7d99d9ef-cc96-4a82-ad6a-d143437e6263"],
+Cell[7626, 226, 266, 6, 44, "Text",ExpressionUUID->"e34ca373-eeb6-4510-8ccd-e99b18b13da7"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[7929, 237, 161, 3, 84, "Section",ExpressionUUID->"1e004997-1d0c-4a2b-89eb-ecfc84ecaead"],
+Cell[8093, 242, 169, 3, 67, "Subsection",ExpressionUUID->"1dafddfa-fee5-48ad-a746-d410605e52d0"],
+Cell[CellGroupData[{
+Cell[8287, 249, 171, 3, 46, "Subsection",ExpressionUUID->"ff518daf-9711-4f0b-acc6-ec8a61d8b90b"],
+Cell[8461, 254, 204, 3, 44, "Text",ExpressionUUID->"61f448b8-23d6-411d-bdd6-be87e4e24e26"]
+}, Open  ]]
+}, Open  ]],
+Cell[8692, 261, 169, 3, 84, "Section",ExpressionUUID->"34c0edda-aa4b-462a-8248-59a238888a6a"],
+Cell[8864, 266, 170, 3, 65, "Section",ExpressionUUID->"f743bfd9-414a-4d0a-a46c-21f8a8857838"],
+Cell[9037, 271, 167, 3, 65, "Section",ExpressionUUID->"ec823701-357d-4213-9d23-a151bf280a27"]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[9241, 279, 270, 6, 71, "Chapter",ExpressionUUID->"62eb9baf-fdd1-444d-8fa1-254f03d748e9"],
+Cell[9514, 287, 160, 3, 84, "Section",ExpressionUUID->"01009efc-48cf-4a04-8c17-b5c7a803b617"],
+Cell[9677, 292, 167, 3, 65, "Section",ExpressionUUID->"617f228d-db11-423a-a104-a7dc89a241f6"],
+Cell[9847, 297, 178, 3, 65, "Section",ExpressionUUID->"33394c82-77cf-430e-a684-349aa9742311"],
+Cell[10028, 302, 206, 3, 65, "Section",ExpressionUUID->"8a014805-5f71-440a-ab5c-8ddf299d8392"],
+Cell[CellGroupData[{
+Cell[10259, 309, 167, 3, 65, "Section",ExpressionUUID->"d4f7bcd1-70f9-4b04-875e-8105982350fb"],
+Cell[10429, 314, 263, 4, 44, "Text",ExpressionUUID->"60a21937-b46b-4784-8e3d-10cb872be768"],
+Cell[CellGroupData[{
+Cell[10717, 322, 526, 12, 85, "Input",ExpressionUUID->"824b23e7-0cc3-489a-ac6c-b9378a478705"],
+Cell[11246, 336, 198, 3, 59, "Output",ExpressionUUID->"90ac7e3f-4d77-4412-894e-4f68feaa2341"],
+Cell[11447, 341, 181, 2, 41, "Output",ExpressionUUID->"4c11fb4c-5ca9-43a5-b7f0-493ff1c1b0c9"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]],
+Cell[11667, 348, 246, 6, 86, "Chapter",ExpressionUUID->"99a35e17-9cdf-483b-b32d-eb2b68429c02"],
+Cell[11916, 356, 222, 5, 71, "Chapter",ExpressionUUID->"32e4cad8-961e-4eb4-8b6f-242c1781e37b"]
+}, Open  ]]
+}
+]
+*)
+
