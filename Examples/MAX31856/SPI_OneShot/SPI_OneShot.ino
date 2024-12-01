@@ -110,7 +110,8 @@ void loop() {
   uint8_t ts = readRegister8(MAX31856_CR0_REG_READ);
   Serial.print("loop start MAX31856_CR0_REG_READ: ");
   Serial.println(ts);
-  
+
+  /*
   //--------------SPI START----------------------
   SPI.beginTransaction(max31856SpiSettings);
     
@@ -141,6 +142,7 @@ void loop() {
   SPI.endTransaction();
   //--------------SPI END------------------------
 
+
   //Bit shift and conversion
   uint16_t ret = dataCJTH;
   
@@ -155,7 +157,17 @@ void loop() {
   //Serial.println(dataCJTL);
   //Serial.println(ret);
   Serial.println(tempCJ);
+    */
 
+  //Read cold junction temperature
+  float tempCJ = readCJTemperature();
+  Serial.print("Cold Junction Temp: ");
+  Serial.println(tempCJ);
+
+  //Read thermocouple temperature
+  float tempTC = readThermocoupleTemperature();
+  
+  //Look at CR0 register at end of loop
   uint8_t te = readRegister8(MAX31856_CR0_REG_READ);
   Serial.print("loop end MAX31856_CR0_REG_READ: ");
   Serial.println(te);
@@ -271,7 +283,7 @@ void setConversionMode(max31856_conversion_mode_t mode) {
   writeRegister8(MAX31856_CR0_REG_WRITE, t); // write value back to register
 }
 
-void triggerOneShot(void) {
+void triggerOneShotASSUMECSLOW(void) {
   //uint8_t t = readRegister8(MAX31856_CR0_REG); // get current register value
 
   SPI.transfer(MAX31856_CR0_REG_READ);
@@ -311,4 +323,54 @@ void triggerAutoConvert(void) {
   //writeRegister8(MAX31856_CR0_REG, t);         // write value back to register
   SPI.transfer(MAX31856_CR0_REG_WRITE);
   SPI.transfer(t);
+}
+
+float readCJTemperature() {
+  uint8_t dataCJTH = readRegister8(MAX31856_CJTH_REG_READ);
+  uint8_t dataCJTL = readRegister8(MAX31856_CJTL_REG_READ);
+  
+  uint16_t ret = dataCJTH;
+  
+  ret <<= 8;
+  ret |= dataCJTL;
+
+  float tempCJ = ret/256.0;
+
+  return tempCJ;
+}
+
+float readThermocoupleTemperature() {
+  //for one-shot make it happen
+  triggerOneShot();
+  uint32_t start = millis();
+  while (!conversionComplete()) {
+    if (millis() - start > 250)
+      return NAN;
+    delay(10);
+  }
+
+  float tempTC = -1.5;
+  return tempTC;
+}
+
+void triggerOneShot() {
+  uint8_t t = readRegister8(MAX31856_CR0_REG_READ); // get current register value
+
+  Serial.print("MAX31856_CR0_REG_READ inside triggerOneShot before: ");
+  Serial.println(t);
+  
+  t &= ~MAX31856_CR0_AUTOCONVERT;              // turn off autoconvert
+  t |= MAX31856_CR0_1SHOT;                     // turn on one-shot
+  writeRegister8(MAX31856_CR0_REG_WRITE, t);         // write value back to register
+
+  uint8_t te = readRegister8(MAX31856_CR0_REG_READ);
+  Serial.print("MAX31856_CR0_REG_READ inside triggerOneShot after: ");
+  Serial.println(te);
+  
+  
+  //conversion starts when CS goes high
+}
+
+bool conversionComplete(void) {
+  return !(readRegister8(MAX31856_CR0_REG_READ) & MAX31856_CR0_1SHOT);
 }
