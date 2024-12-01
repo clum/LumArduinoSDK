@@ -74,7 +74,6 @@ void setup() {
   
   begin();  
 
-  //setThermocoupleType(MAX31856_TCTYPE_K);
   Serial.print("Thermocouple type: ");
   switch (getThermocoupleType() ) {
     case MAX31856_TCTYPE_B: Serial.println("B Type"); break;
@@ -108,19 +107,27 @@ void setup() {
 }
 
 void loop() {
-
+  uint8_t ts = readRegister8(MAX31856_CR0_REG_READ);
+  Serial.print("loop start MAX31856_CR0_REG_READ: ");
+  Serial.println(ts);
+  
   //--------------SPI START----------------------
   SPI.beginTransaction(max31856SpiSettings);
-  
+    
   //write CS low to enable SPI
   digitalWrite(pin_CS,LOW);
+
   
   //select which register to read by sending a single byte with the address of the desired register
   SPI.transfer(MAX31856_CJTH_REG_READ);
   uint8_t dataCJTH = SPI.transfer(sendvalue);
-
-  SPI.transfer(MAX31856_CJTL_REG_READ);
+  
+  //SPI.transfer(MAX31856_CJTL_REG_READ);
   uint8_t dataCJTL = SPI.transfer(sendvalue);
+  
+  
+  //uint8_t dataCJTH = 0;
+  //uint8_t dataCJTL = 0;  
 
   //setup for another one-shot conversion of temperature
   triggerOneShot();
@@ -143,13 +150,17 @@ void loop() {
   float tempCJ = ret/256.0;
 
   //-------------------------------------------
-  Serial.println("Cold Junction Temp: ");
-  Serial.println(dataCJTH);
-  Serial.println(dataCJTL);
+  Serial.print("Cold Junction Temp: ");
+  //Serial.println(dataCJTH);
+  //Serial.println(dataCJTL);
   //Serial.println(ret);
   Serial.println(tempCJ);
-  Serial.println("");
+
+  uint8_t te = readRegister8(MAX31856_CR0_REG_READ);
+  Serial.print("loop end MAX31856_CR0_REG_READ: ");
+  Serial.println(te);
   
+  Serial.println("");  
   delay(1000);
 }
 
@@ -228,10 +239,9 @@ void setAveragingOff() {
   Serial.println("t after readRegister8");
   Serial.println(t);
 
-  //UPDATE LATER
+  //UPDATE LATER SO DIFFERENT AVERAGING SETTINGS BESIDES OFF CAN BE SET
   uint8_t averagingType = 0x00;
-  
-  
+    
   t &= 0x0F; // mask off top 4 bits
   t |= averagingType & 0xF0;
 
@@ -266,13 +276,16 @@ void triggerOneShot(void) {
 
   SPI.transfer(MAX31856_CR0_REG_READ);
   uint8_t t = SPI.transfer(sendvalue);
-
-  Serial.print("MAX31856_CR0_REG_READ: ");
+  Serial.print("MAX31856_CR0_REG_READ inside triggerOneShot: ");
   Serial.println(t);
+  
+  //Serial.print("triggerOneShot MAX31856_CR0_REG_READ: ");
+  //Serial.println(t);
   
   t &= ~MAX31856_CR0_AUTOCONVERT;              // turn off autoconvert
   t |= MAX31856_CR0_1SHOT;                     // turn on one-shot
 
+  Serial.print("t after bit operations: ");
   Serial.println(t);
   
   //writeRegister8(MAX31856_CR0_REG, t);         // write value back to register
