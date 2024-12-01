@@ -18,6 +18,13 @@ Version History
 
 #define MAX31856_CR0_AUTOCONVERT  0x80  ///< Config 0 Auto convert flag
 #define MAX31856_CR0_1SHOT        0x40  ///< Config 0 one shot convert flag
+#define MAX31856_CR0_OCFAULT0     0x10  ///< Config 0 open circuit fault 0 flag (0001 0000)
+
+#define MAX31856_CR1_REG_READ     0x01  ///< Config 1 register (read)
+#define MAX31856_CR1_REG_WRITE    0x81  ///< Config 1 register (write)
+
+#define MAX31856_MASK_REG_READ    0x02 ///< Fault Mask register (read)
+#define MAX31856_MASK_REG_WRITE   0x82 ///< Fault Mask register (write)
 
 #define MAX31856_CJTO_REG_READ    0x09  ///< Cold-Junction Temperature Offset Register (read)
 #define MAX31856_CJTO_REG_WRITE   0x89  ///< Cold-Junction Temperature Offset Register (write)
@@ -39,6 +46,13 @@ typedef enum {
   MAX31856_VMODE_G32 = 0b1100,
 } max31856_thermocoupletype_t;
 
+/** Temperature conversion mode */
+typedef enum {
+  MAX31856_ONESHOT,
+  MAX31856_ONESHOT_NOWAIT,
+  MAX31856_CONTINUOUS
+} max31856_conversion_mode_t;
+
 //Constants
 int pin_CS        = 10;
 int pin_SDI_MOSI  = 11;
@@ -57,6 +71,38 @@ void setup() {
   digitalWrite(pin_CS,HIGH);  //disable CS at initialization
   
   SPI.begin();
+  
+  begin();  
+
+  //setThermocoupleType(MAX31856_TCTYPE_K);
+  Serial.print("Thermocouple type: ");
+  switch (getThermocoupleType() ) {
+    case MAX31856_TCTYPE_B: Serial.println("B Type"); break;
+    case MAX31856_TCTYPE_E: Serial.println("E Type"); break;
+    case MAX31856_TCTYPE_J: Serial.println("J Type"); break;
+    case MAX31856_TCTYPE_K: Serial.println("K Type"); break;
+    case MAX31856_TCTYPE_N: Serial.println("N Type"); break;
+    case MAX31856_TCTYPE_R: Serial.println("R Type"); break;
+    case MAX31856_TCTYPE_S: Serial.println("S Type"); break;
+    case MAX31856_TCTYPE_T: Serial.println("T Type"); break;
+    case MAX31856_VMODE_G8: Serial.println("Voltage x8 Gain mode"); break;
+    case MAX31856_VMODE_G32: Serial.println("Voltage x8 Gain mode"); break;
+    default: Serial.println("Unknown"); break;
+  }
+
+  //Get CR0 and CR1 register values
+  uint8_t t0 = readRegister8(MAX31856_CR0_REG_READ); // get current register value
+  Serial.print("MAX31856_CR0_REG: ");
+  Serial.println(t0);
+
+  uint8_t t1 = readRegister8(MAX31856_CR1_REG_READ); // get current register value
+  Serial.print("MAX31856_CR1_REG: ");
+  Serial.println(t1);
+
+  uint8_t t2 = readRegister8(MAX31856_CJTO_REG_READ); // get current register value
+  Serial.print("MAX31856_CJTO_REG: ");
+  Serial.println(t2);
+  
   Serial.println("Finished setup");
   delay(500);
 }
@@ -90,7 +136,6 @@ void loop() {
 
   //Bit shift and conversion
   uint16_t ret = dataCJTH;
-  uint16_t retBefore = ret;
   
   ret <<= 8;
   ret |= dataCJTL;
@@ -101,7 +146,6 @@ void loop() {
   Serial.println("Cold Junction Temp: ");
   Serial.println(dataCJTH);
   Serial.println(dataCJTL);
-  //Serial.println(retBefore);
   //Serial.println(ret);
   Serial.println(tempCJ);
   Serial.println("");
@@ -110,8 +154,25 @@ void loop() {
 }
 
 void writeRegister8(uint8_t addr, uint8_t data) {
+  SPI.beginTransaction(max31856SpiSettings);
+  digitalWrite(pin_CS,LOW);
   SPI.transfer(addr);
   SPI.transfer(data);
+  digitalWrite(pin_CS,HIGH);
+  SPI.endTransaction();
+}
+
+uint8_t readRegister8(uint8_t addr) {
+  SPI.beginTransaction(max31856SpiSettings);
+  digitalWrite(pin_CS,LOW);
+  
+  uint8_t ret = 0;
+  SPI.transfer(addr);
+  ret = SPI.transfer(sendvalue);
+  digitalWrite(pin_CS,HIGH);
+  SPI.endTransaction();
+  
+  return ret;
 }
 
 bool begin(void) {
@@ -120,22 +181,84 @@ bool begin(void) {
 
   if (!initialized)
     return false;
-
+  */
   // assert on any fault
-  writeRegister8(MAX31856_MASK_REG, 0x0);
+  writeRegister8(MAX31856_MASK_REG_WRITE, 0x0);
 
   // enable open circuit fault detection
-  writeRegister8(MAX31856_CR0_REG, MAX31856_CR0_OCFAULT0);
-  */
+  writeRegister8(MAX31856_CR0_REG_WRITE, MAX31856_CR0_OCFAULT0);
 
   // set cold junction temperature offset to zero
   writeRegister8(MAX31856_CJTO_REG_WRITE, 0x0);
 
   // set Type K by default
-  //setThermocoupleType(MAX31856_TCTYPE_K);
+  setThermocoupleType(MAX31856_TCTYPE_K);
 
+  // set averaging off
+  setAveragingOff();
+  
   // set One-Shot conversion mode
-  //setConversionMode(MAX31856_ONESHOT);
+  setConversionMode(MAX31856_ONESHOT);
+
+  return true;
+}
+
+/*
+Set TC type by writing to CR1 register.
+*/
+void setThermocoupleType(max31856_thermocoupletype_t type) {
+  Serial.println("setThermocoupleType");
+  
+  uint8_t t = readRegister8(MAX31856_CR1_REG_READ);
+  Serial.println("t after readRegister8");
+  Serial.println(t);
+  
+  t &= 0xF0; // mask off bottom 4 bits
+  t |= (uint8_t)type & 0x0F;
+
+  Serial.println("t after bitwise operations");
+  Serial.println(t);
+  writeRegister8(MAX31856_CR1_REG_WRITE, t);  
+}
+
+void setAveragingOff() {  
+  Serial.println("setAveragingOff");
+  
+  uint8_t t = readRegister8(MAX31856_CR1_REG_READ);
+  Serial.println("t after readRegister8");
+  Serial.println(t);
+
+  //UPDATE LATER
+  uint8_t averagingType = 0x00;
+  
+  
+  t &= 0x0F; // mask off top 4 bits
+  t |= averagingType & 0xF0;
+
+  Serial.println("t after bitwise operations");
+  Serial.println(t);
+  writeRegister8(MAX31856_CR1_REG_WRITE, t);  
+}
+
+max31856_thermocoupletype_t getThermocoupleType(void) {
+  uint8_t t = readRegister8(MAX31856_CR1_REG_READ);
+  t &= 0x0F;
+
+  return (max31856_thermocoupletype_t)(t);
+}
+
+void setConversionMode(max31856_conversion_mode_t mode) {
+  //conversionMode = mode;
+  max31856_conversion_mode_t conversionMode  = mode;
+  uint8_t t = readRegister8(MAX31856_CR0_REG_READ); // get current register value
+  if (conversionMode == MAX31856_CONTINUOUS) {
+    t |= MAX31856_CR0_AUTOCONVERT; // turn on automatic
+    t &= ~MAX31856_CR0_1SHOT;      // turn off one-shot
+  } else {
+    t &= ~MAX31856_CR0_AUTOCONVERT; // turn off automatic
+    t |= MAX31856_CR0_1SHOT;        // turn on one-shot
+  }
+  writeRegister8(MAX31856_CR0_REG_WRITE, t); // write value back to register
 }
 
 void triggerOneShot(void) {
