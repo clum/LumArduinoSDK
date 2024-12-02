@@ -9,6 +9,7 @@ lum@uw.edu
 Version History
 11/29/24: Created
 11/30/24: Continued working
+12/01/24: Got CJ temperature reading working
 */
 
 #include <SPI.h>
@@ -31,6 +32,10 @@ Version History
 
 #define MAX31856_CJTH_REG_READ    0x0A  ///< Cold-Junction Temperature Register, MSB (read)
 #define MAX31856_CJTL_REG_READ    0x0B  ///< Cold-Junction Temperature Register, LSB (read)
+
+#define MAX31856_LTCBH_REG_READ   0x0C  ///< Linearized TC Temperature, Byte 2
+#define MAX31856_LTCBM_REG_READ   0x0D  ///< Linearized TC Temperature, Byte 1
+#define MAX31856_LTCBL_REG_READ   0x0E  ///< Linearized TC Temperature, Byte 0
 
 /** Multiple types of thermocouples supported */
 typedef enum {
@@ -55,8 +60,8 @@ typedef enum {
 
 //Constants
 int pin_CS        = 10;
-int pin_SDI_MOSI  = 11;
-int pin_SDO_MISO  = 12;
+//int pin_SDI_MOSI  = 11;
+//int pin_SDO_MISO  = 12;
 
 SPISettings max31856SpiSettings(1000000,MSBFIRST,SPI_MODE1);    //MAX31856 uses SPI_MODE1
 uint8_t sendvalue = 0xFF; //dummy send value used for SPI duplex reading
@@ -166,6 +171,8 @@ void loop() {
 
   //Read thermocouple temperature
   float tempTC = readThermocoupleTemperature();
+  Serial.print("TC Temp: ");
+  Serial.println(tempTC);
   
   //Look at CR0 register at end of loop
   uint8_t te = readRegister8(MAX31856_CR0_REG_READ);
@@ -349,8 +356,39 @@ float readThermocoupleTemperature() {
     delay(10);
   }
 
-  float tempTC = -1.5;
-  return tempTC;
+  //read the thermocouple temperature registers (3 bytes)
+  uint8_t tcByte2 = readRegister8(MAX31856_LTCBH_REG_READ);
+  uint8_t tcByte1 = readRegister8(MAX31856_LTCBM_REG_READ);
+  uint8_t tcByte0 = readRegister8(MAX31856_LTCBL_REG_READ);
+
+  Serial.print("tcByte2: ");
+  Serial.println(tcByte2);
+
+  Serial.print("tcByte1: ");
+  Serial.println(tcByte1);
+
+  Serial.print("tcByte0: ");
+  Serial.println(tcByte0);
+
+  Serial.print("tcByte0: ");
+  Serial.println(tcByte0);
+  
+  int32_t ret = tcByte2;
+  ret <<= 8;
+  ret |= tcByte1;
+  ret <<= 8;
+  ret |= tcByte0;
+
+  int32_t temp24 = ret;
+
+  // and compute temperature
+  if (temp24 & 0x800000) {
+    temp24 |= 0xFF000000; // fix sign
+  }
+
+  temp24 >>= 5; // bottom 5 bits are unused
+
+  return temp24 * 0.0078125;    
 }
 
 void triggerOneShot() {
