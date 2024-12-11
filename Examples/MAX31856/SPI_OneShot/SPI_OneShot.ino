@@ -15,35 +15,36 @@ Version History
 
 #include <SPI.h>
 
-//----------CR0-----------
+//CR0
 #define MAX31856_CR0_REG_READ     0x00  ///< Config 0 register (read)
 #define MAX31856_CR0_REG_WRITE    0x80  ///< Config 0 register (write)
 
-#define MAX31856_CR0_AUTOCONVERT  0x80  ///< Config 0 Auto convert flag
-#define MAX31856_CR0_1SHOT        0x40  ///< Config 0 one shot convert flag
-#define MAX31856_CR0_OCFAULT0     0x10  ///< Config 0 open circuit fault 0 flag (0001 0000)
+#define MAX31856_CR0_AUTOCONVERT  0b10000000    ///< Config 0 Auto convert flag
+#define MAX31856_CR0_1SHOT        0b01000000    ///< Config 0 one shot convert flag
+#define MAX31856_CR0_OCFAULT0     0b00010000    ///< Config 0 open circuit fault 0 flag (0001 0000)
 
-//----------CR1-----------
+//CR1
 #define MAX31856_CR1_REG_READ     0x01  ///< Config 1 register (read)
 #define MAX31856_CR1_REG_WRITE    0x81  ///< Config 1 register (write)
 
+//MASK (AKA Fault Mask Register)
 #define MAX31856_MASK_REG_READ    0x02 ///< Fault Mask register (read)
 #define MAX31856_MASK_REG_WRITE   0x82 ///< Fault Mask register (write)
 
-//----------CJTO-----------
+//CJTO
 #define MAX31856_CJTO_REG_READ    0x09  ///< Cold-Junction Temperature Offset Register (read)
 #define MAX31856_CJTO_REG_WRITE   0x89  ///< Cold-Junction Temperature Offset Register (write)
 
-//----------CJTL/CJTH-----------
+//CJTL/CJTH
 #define MAX31856_CJTH_REG_READ    0x0A  ///< Cold-Junction Temperature Register, MSB (read)
 #define MAX31856_CJTL_REG_READ    0x0B  ///< Cold-Junction Temperature Register, LSB (read)
 
-//----------LTCBH/LTCBM/LTCBL-----------
+//LTCBH/LTCBM/LTCBL
 #define MAX31856_LTCBH_REG_READ   0x0C  ///< Linearized TC Temperature, Byte 2
 #define MAX31856_LTCBM_REG_READ   0x0D  ///< Linearized TC Temperature, Byte 1
 #define MAX31856_LTCBL_REG_READ   0x0E  ///< Linearized TC Temperature, Byte 0
 
-/** Multiple types of thermocouples supported */
+//Supported thermocouples 
 typedef enum {
   MAX31856_TCTYPE_B = 0b0000,
   MAX31856_TCTYPE_E = 0b0001,
@@ -57,17 +58,20 @@ typedef enum {
   MAX31856_VMODE_G32 = 0b1100,
 } max31856_thermocoupletype_t;
 
-/** Temperature conversion mode */
+//Temperature conversion mode
 typedef enum {
   MAX31856_ONESHOT,
   MAX31856_ONESHOT_NOWAIT,
   MAX31856_CONTINUOUS
 } max31856_conversion_mode_t;
 
-//Constants
-SPISettings max31856SpiSettings(1000000,MSBFIRST,SPI_MODE1);    //MAX31856 uses SPI_MODE1
-int pin_CS = 10;
+//SPI
+#define SPIMaxSpeed_hz 1000000
+SPISettings max31856SpiSettings(SPIMaxSpeed_hz,MSBFIRST,SPI_MODE1);    //MAX31856 uses SPI_MODE1
+int pin_CS = 10;    //chip select pin
 uint8_t sendvalue = 0xFF; //dummy send value used for SPI duplex reading
+
+//General settings
 bool debug = true;
 
 void setup() {
@@ -81,27 +85,15 @@ void setup() {
   //SPI
   pinMode(pin_CS,OUTPUT);
   digitalWrite(pin_CS,HIGH);  //disable CS at initialization
-  
   SPI.begin();
+
+  //MAX31856
+  SetupMAX31856();  
   
-  begin();  
-
-  Serial.print("Thermocouple type: ");
-  switch (getThermocoupleType() ) {
-    case MAX31856_TCTYPE_B: Serial.println("B Type"); break;
-    case MAX31856_TCTYPE_E: Serial.println("E Type"); break;
-    case MAX31856_TCTYPE_J: Serial.println("J Type"); break;
-    case MAX31856_TCTYPE_K: Serial.println("K Type"); break;
-    case MAX31856_TCTYPE_N: Serial.println("N Type"); break;
-    case MAX31856_TCTYPE_R: Serial.println("R Type"); break;
-    case MAX31856_TCTYPE_S: Serial.println("S Type"); break;
-    case MAX31856_TCTYPE_T: Serial.println("T Type"); break;
-    case MAX31856_VMODE_G8: Serial.println("Voltage x8 Gain mode"); break;
-    case MAX31856_VMODE_G32: Serial.println("Voltage x8 Gain mode"); break;
-    default: Serial.println("Unknown"); break;
-  }
-
   if(debug) {
+    Serial.println("--------------setup-------------");
+    displayThermocoupleType();
+
     uint8_t t0 = readRegister8(MAX31856_CR0_REG_READ); // get current register value
     Serial.print("MAX31856_CR0_REG: ");
     Serial.println(t0);
@@ -114,7 +106,7 @@ void setup() {
     Serial.print("MAX31856_CJTO_REG: ");
     Serial.println(t2);
     
-    Serial.println("Finished setup");
+    Serial.println("--------Finished setup-----------");
   }
   
   delay(500);
@@ -128,7 +120,7 @@ void loop() {
   }
   
   //Read cold junction temperature
-  float tempCJ = readCJTemperature();
+  float tempCJ = readColdJunctionTemperature();
   Serial.print("CJ Temp: ");
   Serial.println(tempCJ);
 
@@ -167,7 +159,7 @@ uint8_t readRegister8(uint8_t addr) {
   return ret;
 }
 
-bool begin(void) {
+bool SetupMAX31856(void) {
   // assert on any fault
   writeRegister8(MAX31856_MASK_REG_WRITE, 0x0);
 
@@ -190,13 +182,41 @@ bool begin(void) {
 }
 
 /*
-Set TC type by writing to CR1 register.
+Set TC type by writing to the CR1 register.
 */
 void setThermocoupleType(max31856_thermocoupletype_t type) {
   uint8_t t = readRegister8(MAX31856_CR1_REG_READ);
   t &= 0xF0; // mask off bottom 4 bits
   t |= (uint8_t)type & 0x0F;
   writeRegister8(MAX31856_CR1_REG_WRITE, t);  
+}
+
+void displayThermocoupleType() {
+    Serial.print("Thermocouple type: ");
+    switch (getThermocoupleType() ) {
+      case MAX31856_TCTYPE_B: Serial.println("B Type"); break;
+      case MAX31856_TCTYPE_E: Serial.println("E Type"); break;
+      case MAX31856_TCTYPE_J: Serial.println("J Type"); break;
+      case MAX31856_TCTYPE_K: Serial.println("K Type"); break;
+      case MAX31856_TCTYPE_N: Serial.println("N Type"); break;
+      case MAX31856_TCTYPE_R: Serial.println("R Type"); break;
+      case MAX31856_TCTYPE_S: Serial.println("S Type"); break;
+      case MAX31856_TCTYPE_T: Serial.println("T Type"); break;
+      case MAX31856_VMODE_G8: Serial.println("Voltage x8 Gain mode"); break;
+      case MAX31856_VMODE_G32: Serial.println("Voltage x8 Gain mode"); break;
+      default: Serial.println("Unknown"); break;
+  }
+}
+
+/*
+Read TC type by reading from the CR1 register.
+*/
+max31856_thermocoupletype_t getThermocoupleType(void) {
+  //TC type is stored in bits 0-3 of CR1 register
+  uint8_t t = readRegister8(MAX31856_CR1_REG_READ);
+  t &= 0x0F;
+
+  return (max31856_thermocoupletype_t)(t);
 }
 
 void setAveragingOff() {  
@@ -211,28 +231,31 @@ void setAveragingOff() {
   writeRegister8(MAX31856_CR1_REG_WRITE, t);  
 }
 
-max31856_thermocoupletype_t getThermocoupleType(void) {
-  uint8_t t = readRegister8(MAX31856_CR1_REG_READ);
-  t &= 0x0F;
-
-  return (max31856_thermocoupletype_t)(t);
-}
-
+/*
+Set conversion mode by writing to the CR0 register.
+*/
 void setConversionMode(max31856_conversion_mode_t mode) {
-  //conversionMode = mode;
   max31856_conversion_mode_t conversionMode  = mode;
   uint8_t t = readRegister8(MAX31856_CR0_REG_READ); // get current register value
+  
   if (conversionMode == MAX31856_CONTINUOUS) {
     t |= MAX31856_CR0_AUTOCONVERT; // turn on automatic
     t &= ~MAX31856_CR0_1SHOT;      // turn off one-shot
+    
   } else {
     t &= ~MAX31856_CR0_AUTOCONVERT; // turn off automatic
     t |= MAX31856_CR0_1SHOT;        // turn on one-shot
+    
   }
+  
   writeRegister8(MAX31856_CR0_REG_WRITE, t); // write value back to register
 }
 
-float readCJTemperature() {
+/*
+Read the cold junction temperature by reading from the CJTH and CJTL registers
+and performing appropriate bitshifting.
+*/
+float readColdJunctionTemperature() {
   uint8_t dataCJTH = readRegister8(MAX31856_CJTH_REG_READ);
   uint8_t dataCJTL = readRegister8(MAX31856_CJTL_REG_READ);
   
@@ -246,6 +269,10 @@ float readCJTemperature() {
   return tempCJ;
 }
 
+/*
+Read the thermocouple temperature by reading from the LTCBH, LTCBM, and LTCBL registers
+and performing appropriate bitshifting.
+*/
 float readThermocoupleTemperature() {
   //for one-shot make it happen
   triggerOneShot();
@@ -279,6 +306,9 @@ float readThermocoupleTemperature() {
   return temp24 * 0.0078125;    
 }
 
+/*
+Turn off autoconvert and turn on one-shot mode by writing appropriate bits to the CR0 register.
+*/
 void triggerOneShot() {
   uint8_t t = readRegister8(MAX31856_CR0_REG_READ); // get current register value
 
@@ -300,6 +330,9 @@ void triggerOneShot() {
   //conversion starts when CS goes high
 }
 
+/*
+Determine if the temperature conversion is complete.
+*/
 bool conversionComplete(void) {
   return !(readRegister8(MAX31856_CR0_REG_READ) & MAX31856_CR0_1SHOT);
 }
