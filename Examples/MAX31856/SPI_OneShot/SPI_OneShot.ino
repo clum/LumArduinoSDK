@@ -14,6 +14,8 @@ Version History
 */
 
 #include <SPI.h>
+#include <LumMisc.h>
+
 
 //CR0
 #define MAX31856_CR0_REG_READ     0x00  ///< Config 0 register (read)
@@ -21,7 +23,6 @@ Version History
 
 #define MAX31856_CR0_AUTOCONVERT  0b10000000    ///< Config 0 Auto convert flag
 #define MAX31856_CR0_1SHOT        0b01000000    ///< Config 0 one shot convert flag
-#define MAX31856_CR0_OCFAULT0     0b00010000    ///< Config 0 open circuit fault 0 flag (0001 0000)
 
 //CR1
 #define MAX31856_CR1_REG_READ     0x01  ///< Config 1 register (read)
@@ -60,10 +61,19 @@ typedef enum {
 
 //Temperature conversion mode
 typedef enum {
-  MAX31856_ONESHOT,
-  MAX31856_ONESHOT_NOWAIT,
-  MAX31856_CONTINUOUS
-} max31856_conversion_mode_t;
+  MAX31856_CONVERSIONMODE_ONESHOT,
+  MAX31856_CONVERSIONMODE_ONESHOTNOWAIT,
+  MAX31856_CONVERSIONMODE_CONTINUOUS
+} max31856_conversionmode_t;
+
+//Averaging mode
+typedef enum {
+  MAX31856_AVERAGINGMODE_1SAMPLES,
+  MAX31856_AVERAGINGMODE_2SAMPLES,
+  MAX31856_AVERAGINGMODE_4SAMPLES,
+  MAX31856_AVERAGINGMODE_8SAMPLES,
+  MAX31856_AVERAGINGMODE_16SAMPLES
+} max31856_averagingmode_t;
 
 //SPI
 #define SPIMaxSpeed_hz 1000000
@@ -160,34 +170,111 @@ uint8_t readRegister8(uint8_t addr) {
 }
 
 bool SetupMAX31856(void) {
-  // assert on any fault
+  //----------Setup MASK register------------
+  //assert on any fault (set all bits to 0)
   writeRegister8(MAX31856_MASK_REG_WRITE, 0x0);
 
+  //----------Setup CR0 register-------------
+  //initialize register to all 0.  As a byproduct, this sets the following:
+  //  (bit 7)   CMODE = normally off mode
+  //  (bit 6)   1SHOT = no conversions requested
+  //  (bit 5:4) OCFAULT = disabled
+  //  (bit 3)   CJ = cold-junction tmperature sensor enabled
+  //  (bit 2)   FAULT = comparator mode
+  //  (bit 1)   FAULTCLR = default
+  //  (bit 0)   50/60 Hz = 60 Hz
+    writeRegister8(MAX31856_CR0_REG_WRITE, 0x0);
+
   // enable open circuit fault detection
+  #define MAX31856_CR0_OCFAULT0     0b00010000    ///< Config 0 open circuit fault 0 flag (0001 0000)
+
   writeRegister8(MAX31856_CR0_REG_WRITE, MAX31856_CR0_OCFAULT0);
 
-  // set cold junction temperature offset to zero
+  //----------Setup CJTO register-------------
+  // set cold junction temperature offset to zero (set all bits to 0)
   writeRegister8(MAX31856_CJTO_REG_WRITE, 0x0);
 
+  //----------Setup CR1 register-------------
   // set Type K by default
   setThermocoupleType(MAX31856_TCTYPE_K);
 
-  // set averaging off
-  setAveragingOff();
+  // set averaging mode
+  setAveragingMode(MAX31856_AVERAGINGMODE_1SAMPLES);
   
   // set One-Shot conversion mode
-  setConversionMode(MAX31856_ONESHOT);
+  setConversionMode(MAX31856_CONVERSIONMODE_ONESHOT);
 
   return true;
 }
 
+
+//-----------------------CR0 Operations-------------------------------
+/*
+Set conversion mode by writing to the CR0 register (bit 7 for CMODE, bit 6 for 1SHOT).
+*/
+void setConversionMode(max31856_conversionmode_t mode) {
+  max31856_conversionmode_t conversionMode  = mode;
+  uint8_t t = readRegister8(MAX31856_CR0_REG_READ); // get current register value
+  
+  if (conversionMode == MAX31856_CONVERSIONMODE_CONTINUOUS) {
+    t = BitSetToValue(t,7,1); //turn on automatic
+    t = BitSetToValue(t,6,0); //turn off one-shot
+    
+//    t |= MAX31856_CR0_AUTOCONVERT; // turn on automatic
+//    t &= ~MAX31856_CR0_1SHOT;      // turn off one-shot
+    
+  } else {
+    t = BitSetToValue(t,7,0); //turn off automatic
+    t = BitSetToValue(t,6,1); //turn on one-shot
+    
+    //t &= ~MAX31856_CR0_AUTOCONVERT; // turn off automatic
+    //t |= MAX31856_CR0_1SHOT;        // turn on one-shot
+    
+  }
+  
+  writeRegister8(MAX31856_CR0_REG_WRITE, t); // write value back to register
+}
+
+
+/*
+Turn off autoconvert and turn on one-shot mode by writing appropriate bits to the CR0 register.
+*/
+void triggerOneShot() {
+  uint8_t t = readRegister8(MAX31856_CR0_REG_READ); // get current register value
+
+  if(debug) {
+    Serial.print("MAX31856_CR0_REG_READ at triggerOneShot start: ");
+    Serial.println(t);
+  }
+  
+  t &= ~MAX31856_CR0_AUTOCONVERT;             // turn off autoconvert
+  t |= MAX31856_CR0_1SHOT;                    // turn on one-shot
+  writeRegister8(MAX31856_CR0_REG_WRITE,t);   // write value back to register
+
+  if(debug) {
+    uint8_t te = readRegister8(MAX31856_CR0_REG_READ);
+    Serial.print("MAX31856_CR0_REG_READ at triggerOneShot end: ");
+    Serial.println(te);
+  }
+    
+  //conversion starts when CS goes high
+}
+
+/*
+Determine if the temperature conversion is complete.
+*/
+bool conversionComplete(void) {
+  return !(readRegister8(MAX31856_CR0_REG_READ) & MAX31856_CR0_1SHOT);
+}
+
+//-----------------------CR1 Operations-------------------------------
 /*
 Set TC type by writing to the CR1 register.
 */
-void setThermocoupleType(max31856_thermocoupletype_t type) {
+void setThermocoupleType(max31856_thermocoupletype_t tcType) {
   uint8_t t = readRegister8(MAX31856_CR1_REG_READ);
   t &= 0xF0; // mask off bottom 4 bits
-  t |= (uint8_t)type & 0x0F;
+  t |= (uint8_t)tcType & 0x0F;
   writeRegister8(MAX31856_CR1_REG_WRITE, t);  
 }
 
@@ -219,38 +306,70 @@ max31856_thermocoupletype_t getThermocoupleType(void) {
   return (max31856_thermocoupletype_t)(t);
 }
 
-void setAveragingOff() {  
+/*
+Set averaging by writing to the CR1 register (bits 4,5,6)
+*/
+void setAveragingMode(max31856_averagingmode_t averagingMode) {  
   uint8_t t = readRegister8(MAX31856_CR1_REG_READ);
 
-  //UPDATE LATER SO DIFFERENT AVERAGING SETTINGS BESIDES OFF CAN BE SET
-  uint8_t averagingType = 0x00;
-    
-  t &= 0x0F; // mask off top 4 bits
-  t |= averagingType & 0xF0;
+  //set bits 7,6,5,4 (although bit 7 is not used as it is reserved)
+  switch (averagingMode) {
+    case MAX31856_AVERAGINGMODE_1SAMPLES:
+    {
+      //000 = 1 sample
+      t = BitSetToValue(t,6,0);
+      t = BitSetToValue(t,5,0);
+      t = BitSetToValue(t,4,0);
+      break;
+    }
+
+    case MAX31856_AVERAGINGMODE_2SAMPLES:
+    {
+      //001 = 2 sample
+      t = BitSetToValue(t,6,0);
+      t = BitSetToValue(t,5,0);
+      t = BitSetToValue(t,4,1);
+      break;
+    }
+
+    case MAX31856_AVERAGINGMODE_4SAMPLES:
+    {
+      //010 = 4 sample
+      t = BitSetToValue(t,6,0);
+      t = BitSetToValue(t,5,1);
+      t = BitSetToValue(t,4,0);
+      break;
+    }
+
+    case MAX31856_AVERAGINGMODE_8SAMPLES:
+    {
+      //011 = 8 sample
+      t = BitSetToValue(t,6,0);
+      t = BitSetToValue(t,5,1);
+      t = BitSetToValue(t,4,1);
+      break;
+    }
+
+    case MAX31856_AVERAGINGMODE_16SAMPLES:
+    {
+      //1xx = 16 sample
+      t = BitSetToValue(t,6,1);
+      t = BitSetToValue(t,5,1);
+      t = BitSetToValue(t,4,1);
+      break;
+    }
+
+    default:
+    {
+      Serial.println("Unsupported averaging mode");
+      break;
+    }
+  }
 
   writeRegister8(MAX31856_CR1_REG_WRITE, t);  
 }
 
-/*
-Set conversion mode by writing to the CR0 register.
-*/
-void setConversionMode(max31856_conversion_mode_t mode) {
-  max31856_conversion_mode_t conversionMode  = mode;
-  uint8_t t = readRegister8(MAX31856_CR0_REG_READ); // get current register value
-  
-  if (conversionMode == MAX31856_CONTINUOUS) {
-    t |= MAX31856_CR0_AUTOCONVERT; // turn on automatic
-    t &= ~MAX31856_CR0_1SHOT;      // turn off one-shot
-    
-  } else {
-    t &= ~MAX31856_CR0_AUTOCONVERT; // turn off automatic
-    t |= MAX31856_CR0_1SHOT;        // turn on one-shot
-    
-  }
-  
-  writeRegister8(MAX31856_CR0_REG_WRITE, t); // write value back to register
-}
-
+//-----------------------CJTH/CJTL Operations-------------------------------
 /*
 Read the cold junction temperature by reading from the CJTH and CJTL registers
 and performing appropriate bitshifting.
@@ -269,6 +388,7 @@ float readColdJunctionTemperature() {
   return tempCJ;
 }
 
+//-----------------------LTCBH/LTCBM/LTCBL Operations-------------------------------
 /*
 Read the thermocouple temperature by reading from the LTCBH, LTCBM, and LTCBL registers
 and performing appropriate bitshifting.
@@ -304,35 +424,4 @@ float readThermocoupleTemperature() {
   temp24 >>= 5; // bottom 5 bits are unused
 
   return temp24 * 0.0078125;    
-}
-
-/*
-Turn off autoconvert and turn on one-shot mode by writing appropriate bits to the CR0 register.
-*/
-void triggerOneShot() {
-  uint8_t t = readRegister8(MAX31856_CR0_REG_READ); // get current register value
-
-  if(debug) {
-    Serial.print("MAX31856_CR0_REG_READ at triggerOneShot start: ");
-    Serial.println(t);
-  }
-  
-  t &= ~MAX31856_CR0_AUTOCONVERT;             // turn off autoconvert
-  t |= MAX31856_CR0_1SHOT;                    // turn on one-shot
-  writeRegister8(MAX31856_CR0_REG_WRITE,t);   // write value back to register
-
-  if(debug) {
-    uint8_t te = readRegister8(MAX31856_CR0_REG_READ);
-    Serial.print("MAX31856_CR0_REG_READ at triggerOneShot end: ");
-    Serial.println(te);
-  }
-    
-  //conversion starts when CS goes high
-}
-
-/*
-Determine if the temperature conversion is complete.
-*/
-bool conversionComplete(void) {
-  return !(readRegister8(MAX31856_CR0_REG_READ) & MAX31856_CR0_1SHOT);
 }
