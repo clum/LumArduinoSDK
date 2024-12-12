@@ -10,6 +10,7 @@ Version History
 11/29/24: Created
 11/30/24: Continued working
 12/01/24: Got CJ temperature reading working
+12/11/24: Updated from hex to binary representation for ease of reading
 */
 
 #include <SPI.h>
@@ -64,8 +65,8 @@ typedef enum {
 } max31856_conversion_mode_t;
 
 //Constants
-int pin_CS        = 10;
 SPISettings max31856SpiSettings(1000000,MSBFIRST,SPI_MODE1);    //MAX31856 uses SPI_MODE1
+int pin_CS = 10;
 uint8_t sendvalue = 0xFF; //dummy send value used for SPI duplex reading
 bool debug = true;
 
@@ -230,52 +231,6 @@ void setConversionMode(max31856_conversion_mode_t mode) {
   }
   writeRegister8(MAX31856_CR0_REG_WRITE, t); // write value back to register
 }
-
-/*
-void triggerOneShotASSUMECSLOW(void) {
-  //uint8_t t = readRegister8(MAX31856_CR0_REG); // get current register value
-
-  SPI.transfer(MAX31856_CR0_REG_READ);
-  uint8_t t = SPI.transfer(sendvalue);
-  Serial.print("MAX31856_CR0_REG_READ inside triggerOneShot: ");
-  Serial.println(t);
-  
-  //Serial.print("triggerOneShot MAX31856_CR0_REG_READ: ");
-  //Serial.println(t);
-  
-  t &= ~MAX31856_CR0_AUTOCONVERT;              // turn off autoconvert
-  t |= MAX31856_CR0_1SHOT;                     // turn on one-shot
-
-  Serial.print("t after bit operations: ");
-  Serial.println(t);
-  
-  //writeRegister8(MAX31856_CR0_REG, t);         // write value back to register
-  SPI.transfer(MAX31856_CR0_REG_WRITE);
-  SPI.transfer(t);
-
-  delay(200);
-}
-*/
-
-/*
-void triggerAutoConvert(void) {
-  //uint8_t t = readRegister8(MAX31856_CR0_REG); // get current register value
-
-  SPI.transfer(MAX31856_CR0_REG_READ);
-  uint8_t t = SPI.transfer(sendvalue);
-
-  //Serial.print("MAX31856_CR0_REG_READ: ");
-  //Serial.println(t);
-  
-  t |= MAX31856_CR0_AUTOCONVERT;              // turn on autoconvert
-  
-  //Serial.println(t);
-  
-  //writeRegister8(MAX31856_CR0_REG, t);         // write value back to register
-  SPI.transfer(MAX31856_CR0_REG_WRITE);
-  SPI.transfer(t);
-}
-*/
 
 float readCJTemperature() {
   uint8_t dataCJTH = readRegister8(MAX31856_CJTH_REG_READ);
