@@ -11,6 +11,7 @@ lum@uw.edu
 
 Version History
 11/13/24: Created
+12/13/24: Note that this does not appear to be operational and was not successful.
 */
 
 //Constants
@@ -172,22 +173,12 @@ unsigned long shiftIn(const int data_pin, const int clock_pin, const int cs_pin,
   {
     data <<= 1;
     digitalWrite(clock_pin, LOW);
-    delayMicroseconds(1);
+    delayMicroseconds(15);
     digitalWrite(clock_pin, HIGH);
-    delayMicroseconds(1);
+    delayMicroseconds(15);
 
     data |= digitalRead(data_pin);
   }
   digitalWrite(cs_pin, HIGH);
   return data;
-}
-
-
-/*
-
- */
-unsigned long FrequencyToPeriodMs(unsigned int fHz) {
-  //ERROR: START HERE!!!
-  return 0;
-
 }

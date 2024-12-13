@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LumFastLED", "LumFastLED\Lu
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LumTinyGPSPlus", "LumTinyGPSPlus\LumTinyGPSPlus.vcxproj", "{88CF8587-B743-49F5-9FDF-D183456E48A3}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LumSPI", "LumSPI\LumSPI.vcxproj", "{34D732C3-610B-4AB4-AFA5-8C56EAAE9C25}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -41,6 +43,14 @@ Global
 		{88CF8587-B743-49F5-9FDF-D183456E48A3}.Release|x64.Build.0 = Release|x64
 		{88CF8587-B743-49F5-9FDF-D183456E48A3}.Release|x86.ActiveCfg = Release|Win32
 		{88CF8587-B743-49F5-9FDF-D183456E48A3}.Release|x86.Build.0 = Release|Win32
+		{34D732C3-610B-4AB4-AFA5-8C56EAAE9C25}.Debug|x64.ActiveCfg = Debug|x64
+		{34D732C3-610B-4AB4-AFA5-8C56EAAE9C25}.Debug|x64.Build.0 = Debug|x64
+		{34D732C3-610B-4AB4-AFA5-8C56EAAE9C25}.Debug|x86.ActiveCfg = Debug|Win32
+		{34D732C3-610B-4AB4-AFA5-8C56EAAE9C25}.Debug|x86.Build.0 = Debug|Win32
+		{34D732C3-610B-4AB4-AFA5-8C56EAAE9C25}.Release|x64.ActiveCfg = Release|x64
+		{34D732C3-610B-4AB4-AFA5-8C56EAAE9C25}.Release|x64.Build.0 = Release|x64
+		{34D732C3-610B-4AB4-AFA5-8C56EAAE9C25}.Release|x86.ActiveCfg = Release|Win32
+		{34D732C3-610B-4AB4-AFA5-8C56EAAE9C25}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
