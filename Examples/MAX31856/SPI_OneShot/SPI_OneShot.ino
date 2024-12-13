@@ -113,15 +113,15 @@ void setup() {
     Serial.println("--------------setup-------------");
     displayThermocoupleType();
 
-    uint8_t t0 = readRegister8LOCAL(MAX31856_CR0_REG_READ); // get current register value
+    uint8_t t0 = readRegister8(max31856SpiSettings,pin_CS,MAX31856_CR0_REG_READ); // get current register value
     Serial.print("MAX31856_CR0_REG: ");
     Serial.println(t0);
   
-    uint8_t t1 = readRegister8LOCAL(MAX31856_CR1_REG_READ); // get current register value
+    uint8_t t1 = readRegister8(max31856SpiSettings,pin_CS,MAX31856_CR1_REG_READ); // get current register value
     Serial.print("MAX31856_CR1_REG: ");
     Serial.println(t1);
   
-    uint8_t t2 = readRegister8LOCAL(MAX31856_CJTO_REG_READ); // get current register value
+    uint8_t t2 = readRegister8(max31856SpiSettings,pin_CS,MAX31856_CJTO_REG_READ); // get current register value
     Serial.print("MAX31856_CJTO_REG: ");
     Serial.println(t2);
     
@@ -133,7 +133,7 @@ void setup() {
 
 void loop() {
   if(debug) {
-    uint8_t ts = readRegister8LOCAL(MAX31856_CR0_REG_READ);
+    uint8_t ts = readRegister8(max31856SpiSettings,pin_CS,MAX31856_CR0_REG_READ);
     Serial.print("MAX31856_CR0_REG_READ at loop start: ");
     Serial.println(ts);
   }
@@ -149,7 +149,7 @@ void loop() {
   Serial.println(tempTC);
   
   if(debug) {
-    uint8_t te = readRegister8LOCAL(MAX31856_CR0_REG_READ);
+    uint8_t te = readRegister8(max31856SpiSettings,pin_CS,MAX31856_CR0_REG_READ);
     Serial.print("MAX31856_CR0_REG_READ at loop end: ");
     Serial.println(te);  
   }
@@ -158,30 +158,13 @@ void loop() {
   delay(1000);
 }
 
-void writeRegister8LOCAL(uint8_t addr, uint8_t data) {
-  SPI.beginTransaction(max31856SpiSettings);
-  digitalWrite(pin_CS,LOW);
-  SPI.transfer(addr);
-  SPI.transfer(data);
-  digitalWrite(pin_CS,HIGH);
-  SPI.endTransaction();
-}
-
-uint8_t readRegister8LOCAL(uint8_t addr) {
-  SPI.beginTransaction(max31856SpiSettings);
-  digitalWrite(pin_CS,LOW);  
-  SPI.transfer(addr);
-  uint8_t ret = SPI.transfer(sendvalue);
-  digitalWrite(pin_CS,HIGH);
-  SPI.endTransaction();
-  
-  return ret;
-}
-
+/*
+Setup and initialize various registers on the MAX31856
+*/
 bool SetupMAX31856(void) {
   //----------Setup MASK register------------
   //assert on any fault (set all bits to 0)
-  writeRegister8LOCAL(MAX31856_MASK_REG_WRITE, 0x0);
+  writeRegister8(max31856SpiSettings,pin_CS,MAX31856_MASK_REG_WRITE, 0x0);
 
   //----------Setup CR0 register-------------
   //initialize register to all 0.  As a byproduct, this sets the following:
@@ -192,7 +175,7 @@ bool SetupMAX31856(void) {
   //  (bit 2)   FAULT = comparator mode
   //  (bit 1)   FAULTCLR = default
   //  (bit 0)   50/60 Hz = 60 Hz
-  writeRegister8LOCAL(MAX31856_CR0_REG_WRITE, 0x0);
+  writeRegister8(max31856SpiSettings,pin_CS,MAX31856_CR0_REG_WRITE, 0x0);
 
   //enable open circuit fault detection
   setOpenCircuitDetectionMode(MAX31856_OCDETECTIONMODE_ENABLEDA);
@@ -205,7 +188,7 @@ bool SetupMAX31856(void) {
   //  (bit 7)   <RESERVED>
   //  (bit 6:4) AVGSEL = 1 sample
   //  (bit 3:0) TC TYPE = B Type
-  writeRegister8LOCAL(MAX31856_CR1_REG_WRITE, 0x0);
+  writeRegister8(max31856SpiSettings,pin_CS,MAX31856_CR1_REG_WRITE, 0x0);
 
   //set thermocouple type
   setThermocoupleType(MAX31856_TCTYPE_K);
@@ -215,7 +198,7 @@ bool SetupMAX31856(void) {
 
   //----------Setup CJTO register-------------
   // set cold junction temperature offset to zero (set all bits to 0)
-  writeRegister8LOCAL(MAX31856_CJTO_REG_WRITE, 0x0);
+  writeRegister8(max31856SpiSettings,pin_CS,MAX31856_CJTO_REG_WRITE, 0x0);
   
   return true;
 }
@@ -226,7 +209,7 @@ Set conversion mode by writing to the CR0 register (bit 7 for CMODE, bit 6 for 1
 */
 void setConversionMode(max31856_conversionmode_t mode) {
   //get current register value
-  uint8_t t = readRegister8LOCAL(MAX31856_CR0_REG_READ);
+  uint8_t t = readRegister8(max31856SpiSettings,pin_CS,MAX31856_CR0_REG_READ);
 
   switch(mode) {
     case MAX31856_CONVERSIONMODE_ONESHOT:
@@ -254,7 +237,7 @@ void setConversionMode(max31856_conversionmode_t mode) {
   }
 
   //write value back to register
-  writeRegister8LOCAL(MAX31856_CR0_REG_WRITE, t);
+  writeRegister8(max31856SpiSettings,pin_CS,MAX31856_CR0_REG_WRITE, t);
 }
 
 /*
@@ -264,7 +247,7 @@ AKA Table 4 in MAX31856 data sheet
 */
 void setOpenCircuitDetectionMode(max31856_opencircuitdetectionmode_t mode) {
   //get current register value
-  uint8_t t = readRegister8LOCAL(MAX31856_CR0_REG_READ);
+  uint8_t t = readRegister8(max31856SpiSettings,pin_CS,MAX31856_CR0_REG_READ);
   
   switch(mode) {
     case MAX31856_OCDETECTIONMODE_DISABLED:
@@ -299,14 +282,14 @@ void setOpenCircuitDetectionMode(max31856_opencircuitdetectionmode_t mode) {
   }
 
   //write value back to register
-  writeRegister8LOCAL(MAX31856_CR0_REG_WRITE, t);
+  writeRegister8(max31856SpiSettings,pin_CS,MAX31856_CR0_REG_WRITE, t);
 }
 
 /*
 Turn off autoconvert and turn on one-shot mode by writing appropriate bits to the CR0 register.
 */
 void triggerOneShot() {
-  uint8_t t = readRegister8LOCAL(MAX31856_CR0_REG_READ); // get current register value
+  uint8_t t = readRegister8(max31856SpiSettings,pin_CS,MAX31856_CR0_REG_READ); // get current register value
 
   if(debug) {
     Serial.print("MAX31856_CR0_REG_READ at triggerOneShot start: ");
@@ -315,10 +298,10 @@ void triggerOneShot() {
   
   t &= ~MAX31856_CR0_AUTOCONVERT;             // turn off autoconvert
   t |= MAX31856_CR0_1SHOT;                    // turn on one-shot
-  writeRegister8LOCAL(MAX31856_CR0_REG_WRITE,t);   // write value back to register
+  writeRegister8(max31856SpiSettings,pin_CS,MAX31856_CR0_REG_WRITE,t);   // write value back to register
 
   if(debug) {
-    uint8_t te = readRegister8LOCAL(MAX31856_CR0_REG_READ);
+    uint8_t te = readRegister8(max31856SpiSettings,pin_CS,MAX31856_CR0_REG_READ);
     Serial.print("MAX31856_CR0_REG_READ at triggerOneShot end: ");
     Serial.println(te);
   }
@@ -330,7 +313,7 @@ void triggerOneShot() {
 Determine if the temperature conversion is complete.
 */
 bool conversionComplete(void) {
-  return !(readRegister8LOCAL(MAX31856_CR0_REG_READ) & MAX31856_CR0_1SHOT);
+  return !(readRegister8(max31856SpiSettings,pin_CS,MAX31856_CR0_REG_READ) & MAX31856_CR0_1SHOT);
 }
 
 //-----------------------CR1 Functions-------------------------------
@@ -338,10 +321,10 @@ bool conversionComplete(void) {
 Set TC type by writing to the CR1 register.
 */
 void setThermocoupleType(max31856_thermocoupletype_t tcType) {
-  uint8_t t = readRegister8LOCAL(MAX31856_CR1_REG_READ);
+  uint8_t t = readRegister8(max31856SpiSettings,pin_CS,MAX31856_CR1_REG_READ);
   t &= 0xF0; // mask off bottom 4 bits
   t |= (uint8_t)tcType & 0x0F;
-  writeRegister8LOCAL(MAX31856_CR1_REG_WRITE, t);  
+  writeRegister8(max31856SpiSettings,pin_CS,MAX31856_CR1_REG_WRITE, t);  
 }
 
 void displayThermocoupleType() {
@@ -366,7 +349,7 @@ Read TC type by reading from the CR1 register.
 */
 max31856_thermocoupletype_t getThermocoupleType(void) {
   //TC type is stored in bits 0-3 of CR1 register
-  uint8_t t = readRegister8LOCAL(MAX31856_CR1_REG_READ);
+  uint8_t t = readRegister8(max31856SpiSettings,pin_CS,MAX31856_CR1_REG_READ);
   t &= 0x0F;
 
   return (max31856_thermocoupletype_t)(t);
@@ -376,7 +359,7 @@ max31856_thermocoupletype_t getThermocoupleType(void) {
 Set averaging by writing to the CR1 register (bits 4,5,6)
 */
 void setAveragingMode(max31856_averagingmode_t averagingMode) {  
-  uint8_t t = readRegister8LOCAL(MAX31856_CR1_REG_READ);
+  uint8_t t = readRegister8(max31856SpiSettings,pin_CS,MAX31856_CR1_REG_READ);
 
   //set bits 7,6,5,4 (although bit 7 is not used as it is reserved)
   switch (averagingMode) {
@@ -432,7 +415,7 @@ void setAveragingMode(max31856_averagingmode_t averagingMode) {
     }
   }
 
-  writeRegister8LOCAL(MAX31856_CR1_REG_WRITE, t);  
+  writeRegister8(max31856SpiSettings,pin_CS,MAX31856_CR1_REG_WRITE, t);  
 }
 
 //-----------------------CJTH/CJTL Functions-------------------------------
@@ -441,8 +424,8 @@ Read the cold junction temperature by reading from the CJTH and CJTL registers
 and performing appropriate bitshifting.
 */
 float readColdJunctionTemperature() {
-  uint8_t dataCJTH = readRegister8LOCAL(MAX31856_CJTH_REG_READ);
-  uint8_t dataCJTL = readRegister8LOCAL(MAX31856_CJTL_REG_READ);
+  uint8_t dataCJTH = readRegister8(max31856SpiSettings,pin_CS,MAX31856_CJTH_REG_READ);
+  uint8_t dataCJTL = readRegister8(max31856SpiSettings,pin_CS,MAX31856_CJTL_REG_READ);
   
   uint16_t ret = dataCJTH;
   
@@ -470,9 +453,9 @@ float readThermocoupleTemperature() {
   }
 
   //read the thermocouple temperature registers (3 bytes)
-  uint8_t tcByte2 = readRegister8LOCAL(MAX31856_LTCBH_REG_READ);
-  uint8_t tcByte1 = readRegister8LOCAL(MAX31856_LTCBM_REG_READ);
-  uint8_t tcByte0 = readRegister8LOCAL(MAX31856_LTCBL_REG_READ);
+  uint8_t tcByte2 = readRegister8(max31856SpiSettings,pin_CS,MAX31856_LTCBH_REG_READ);
+  uint8_t tcByte1 = readRegister8(max31856SpiSettings,pin_CS,MAX31856_LTCBM_REG_READ);
+  uint8_t tcByte0 = readRegister8(max31856SpiSettings,pin_CS,MAX31856_LTCBL_REG_READ);
   
   int32_t ret = tcByte2;
   ret <<= 8;
