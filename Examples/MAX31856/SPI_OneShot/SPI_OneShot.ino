@@ -11,6 +11,7 @@ Version History
 11/30/24: Continued working
 12/01/24: Got CJ temperature reading working
 12/11/24: Updated from hex to binary representation for ease of reading
+12/14/24: Updated documentation (while working to port to MATLAB)
 */
 
 #include <SPI.h>
@@ -19,32 +20,32 @@ Version History
 
 
 //CR0
-#define MAX31856_CR0_REG_READ     0x00  ///< Config 0 register (read)
-#define MAX31856_CR0_REG_WRITE    0x80  ///< Config 0 register (write)
+#define MAX31856_CR0_REG_READ     0x00          //Config 0 register (read)
+#define MAX31856_CR0_REG_WRITE    0x80          //Config 0 register (write)
 
-#define MAX31856_CR0_AUTOCONVERT  0b10000000    ///< Config 0 Auto convert flag
-#define MAX31856_CR0_1SHOT        0b01000000    ///< Config 0 one shot convert flag
+#define MAX31856_CR0_AUTOCONVERT  0b10000000    //Config 0 Auto convert flag
+#define MAX31856_CR0_1SHOT        0b01000000    //Config 0 one shot convert flag
 
 //CR1
-#define MAX31856_CR1_REG_READ     0x01  ///< Config 1 register (read)
-#define MAX31856_CR1_REG_WRITE    0x81  ///< Config 1 register (write)
+#define MAX31856_CR1_REG_READ     0x01          //Config 1 register (read)
+#define MAX31856_CR1_REG_WRITE    0x81          //Config 1 register (write)
 
 //MASK (AKA Fault Mask Register)
-#define MAX31856_MASK_REG_READ    0x02 ///< Fault Mask register (read)
-#define MAX31856_MASK_REG_WRITE   0x82 ///< Fault Mask register (write)
+#define MAX31856_MASK_REG_READ    0x02          //Fault Mask register (read)
+#define MAX31856_MASK_REG_WRITE   0x82          //Fault Mask register (write)
 
 //CJTO
-#define MAX31856_CJTO_REG_READ    0x09  ///< Cold-Junction Temperature Offset Register (read)
-#define MAX31856_CJTO_REG_WRITE   0x89  ///< Cold-Junction Temperature Offset Register (write)
+#define MAX31856_CJTO_REG_READ    0x09          //Cold-Junction Temperature Offset Register (read)
+#define MAX31856_CJTO_REG_WRITE   0x89          //Cold-Junction Temperature Offset Register (write)
 
 //CJTL/CJTH
-#define MAX31856_CJTH_REG_READ    0x0A  ///< Cold-Junction Temperature Register, MSB (read)
-#define MAX31856_CJTL_REG_READ    0x0B  ///< Cold-Junction Temperature Register, LSB (read)
+#define MAX31856_CJTH_REG_READ    0x0A          //Cold-Junction Temperature Register, MSB (read)
+#define MAX31856_CJTL_REG_READ    0x0B          //Cold-Junction Temperature Register, LSB (read)
 
 //LTCBH/LTCBM/LTCBL
-#define MAX31856_LTCBH_REG_READ   0x0C  ///< Linearized TC Temperature, Byte 2
-#define MAX31856_LTCBM_REG_READ   0x0D  ///< Linearized TC Temperature, Byte 1
-#define MAX31856_LTCBL_REG_READ   0x0E  ///< Linearized TC Temperature, Byte 0
+#define MAX31856_LTCBH_REG_READ   0x0C          //Linearized TC Temperature, Byte 2
+#define MAX31856_LTCBM_REG_READ   0x0D          //Linearized TC Temperature, Byte 1
+#define MAX31856_LTCBL_REG_READ   0x0E          //Linearized TC Temperature, Byte 0
 
 //Supported thermocouples 
 typedef enum {
