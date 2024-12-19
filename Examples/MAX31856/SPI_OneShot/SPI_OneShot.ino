@@ -478,7 +478,8 @@ and performing appropriate bitshifting/conversions.
 */
 float readThermocoupleTemperature() {
   //Version History
-  //12/18/24: Moved triggerOneShot to loop
+  //12/12/24: Created
+  //12/18/24: Moved triggerOneShot to loop.  Minor update to output variable name
   
   //read the thermocouple temperature registers (3 bytes)
   uint8_t tcByte2 = readRegister8(max31856SpiSettings,pin_CS,MAX31856_LTCBH_REG_READ);
@@ -493,12 +494,14 @@ float readThermocoupleTemperature() {
 
   int32_t temp24 = ret;
 
-  // and compute temperature
+  //fix sign
   if (temp24 & 0x800000) {
-    temp24 |= 0xFF000000; // fix sign
+    temp24 |= 0xFF000000;
   }
 
+  //perform conversion
   temp24 >>= 5; // bottom 5 bits are unused
+  float tempTC = temp24*0.0078125;
 
-  return temp24 * 0.0078125;    
+  return tempTC;
 }
