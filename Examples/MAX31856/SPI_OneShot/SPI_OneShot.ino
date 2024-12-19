@@ -23,9 +23,6 @@ Version History
 #define MAX31856_CR0_REG_READ     0x00          //Config 0 register (read)
 #define MAX31856_CR0_REG_WRITE    0x80          //Config 0 register (write)
 
-#define MAX31856_CR0_AUTOCONVERT  0b10000000    //Config 0 Auto convert flag
-#define MAX31856_CR0_1SHOT        0b01000000    //Config 0 one shot convert flag
-
 //CR1
 #define MAX31856_CR1_REG_READ     0x01          //Config 1 register (read)
 #define MAX31856_CR1_REG_WRITE    0x81          //Config 1 register (write)
@@ -137,6 +134,15 @@ void loop() {
     uint8_t ts = readRegister8(max31856SpiSettings,pin_CS,MAX31856_CR0_REG_READ);
     Serial.print("MAX31856_CR0_REG_READ at loop start: ");
     Serial.println(ts);
+  }
+
+  //trigger a one-shot conversion
+  triggerOneShot();
+  uint32_t start = millis();
+  while (!conversionComplete()) {
+    if (millis() - start > 250)
+      return NAN;
+    delay(10);
   }
   
   //Read cold junction temperature
@@ -290,15 +296,20 @@ void setOpenCircuitDetectionMode(max31856_opencircuitdetectionmode_t mode) {
 Turn off autoconvert and turn on one-shot mode by writing appropriate bits to the CR0 register.
 */
 void triggerOneShot() {
+  //Version History
+  //12/11/24: Created
+  //12/18/24: Updated how autoconvert and one-shot are turned off and on
+  
   uint8_t t = readRegister8(max31856SpiSettings,pin_CS,MAX31856_CR0_REG_READ); // get current register value
 
   if(debug) {
     Serial.print("MAX31856_CR0_REG_READ at triggerOneShot start: ");
     Serial.println(t);
   }
-  
-  t &= ~MAX31856_CR0_AUTOCONVERT;             // turn off autoconvert
-  t |= MAX31856_CR0_1SHOT;                    // turn on one-shot
+
+  t = BitSetToValue(t,7,0);   //turn off autoconvert
+  t = BitSetToValue(t,6,1);   //turn on one-shot
+    
   writeRegister8(max31856SpiSettings,pin_CS,MAX31856_CR0_REG_WRITE,t);   // write value back to register
 
   if(debug) {
@@ -314,7 +325,16 @@ void triggerOneShot() {
 Determine if the temperature conversion is complete.
 */
 bool conversionComplete(void) {
-  return !(readRegister8(max31856SpiSettings,pin_CS,MAX31856_CR0_REG_READ) & MAX31856_CR0_1SHOT);
+  //Version History
+  //12/12/24: Created
+  //12/18/24: Changed implementation to simply check bit 6.  Original functionalty was "return !(readRegister8(max31856SpiSettings,pin_CS,MAX31856_CR0_REG_READ) & MAX31856_CR0_1SHOT);"
+
+  uint8_t t = readRegister8(max31856SpiSettings,pin_CS,MAX31856_CR0_REG_READ);
+  if(BitIs1(t,6)) {
+    return false;
+  } else {
+    return true;
+  }
 }
 
 //-----------------------CR1 Functions-------------------------------
@@ -454,18 +474,12 @@ float readColdJunctionTemperature() {
 //-----------------------LTCBH/LTCBM/LTCBL Functions-------------------------------
 /*
 Read the thermocouple temperature by reading from the LTCBH, LTCBM, and LTCBL registers
-and performing appropriate bitshifting.
+and performing appropriate bitshifting/conversions.
 */
 float readThermocoupleTemperature() {
-  //for one-shot make it happen
-  triggerOneShot();
-  uint32_t start = millis();
-  while (!conversionComplete()) {
-    if (millis() - start > 250)
-      return NAN;
-    delay(10);
-  }
-
+  //Version History
+  //12/18/24: Moved triggerOneShot to loop
+  
   //read the thermocouple temperature registers (3 bytes)
   uint8_t tcByte2 = readRegister8(max31856SpiSettings,pin_CS,MAX31856_LTCBH_REG_READ);
   uint8_t tcByte1 = readRegister8(max31856SpiSettings,pin_CS,MAX31856_LTCBM_REG_READ);
