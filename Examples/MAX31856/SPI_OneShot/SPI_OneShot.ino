@@ -12,12 +12,12 @@ Version History
 12/01/24: Got CJ temperature reading working
 12/11/24: Updated from hex to binary representation for ease of reading
 12/14/24: Updated documentation (while working to port to MATLAB)
+12/18/24: Minor update to documentation
 */
 
 #include <SPI.h>
 #include <LumMisc.h>
 #include"LumSPI.h"
-
 
 //CR0
 #define MAX31856_CR0_REG_READ     0x00          //Config 0 register (read)
@@ -88,8 +88,8 @@ typedef enum {
 //SPI
 #define SPIMaxSpeed_hz 1000000
 SPISettings max31856SpiSettings(SPIMaxSpeed_hz,MSBFIRST,SPI_MODE1);    //MAX31856 uses SPI_MODE1
-int pin_CS = 10;    //chip select pin
-uint8_t sendvalue = 0xFF; //dummy send value used for SPI duplex reading
+int pin_CS = 10;                                                      //chip select pin
+uint8_t sendvalue = 0xFF;                                             //dummy send value used for SPI duplex reading
 
 //General settings
 bool debug = true;
@@ -172,7 +172,7 @@ bool SetupMAX31856(void) {
   //  (bit 7)   CMODE = normally off mode
   //  (bit 6)   1SHOT = no conversions requested
   //  (bit 5:4) OCFAULT = disabled
-  //  (bit 3)   CJ = cold-junction tmperature sensor enabled
+  //  (bit 3)   CJ = cold-junction temperature sensor enabled
   //  (bit 2)   FAULT = comparator mode
   //  (bit 1)   FAULTCLR = default
   //  (bit 0)   50/60 Hz = 60 Hz
@@ -198,7 +198,7 @@ bool SetupMAX31856(void) {
   setAveragingMode(MAX31856_AVERAGINGMODE_1SAMPLES);
 
   //----------Setup CJTO register-------------
-  // set cold junction temperature offset to zero (set all bits to 0)
+  //set cold junction temperature offset to zero (set all bits to 0)
   writeRegister8(max31856SpiSettings,pin_CS,MAX31856_CJTO_REG_WRITE, 0x0);
   
   return true;
@@ -322,12 +322,33 @@ bool conversionComplete(void) {
 Set TC type by writing to the CR1 register.
 */
 void setThermocoupleType(max31856_thermocoupletype_t tcType) {
-  uint8_t t = readRegister8(max31856SpiSettings,pin_CS,MAX31856_CR1_REG_READ);
+  //Version History
+  //12/18/24: Updating documentation
+
+  uint8_t t = readRegister8(max31856SpiSettings,pin_CS,MAX31856_CR1_REG_READ);  // get current register value
   t &= 0xF0; // mask off bottom 4 bits
   t |= (uint8_t)tcType & 0x0F;
+  
   writeRegister8(max31856SpiSettings,pin_CS,MAX31856_CR1_REG_WRITE, t);  
 }
 
+/*
+Read TC type by reading from the CR1 register.
+*/
+max31856_thermocoupletype_t getThermocoupleType(void) {
+  //Version History
+  //12/18/24: Minor update to documentation
+  
+  //TC type is stored in bits 0-3 of CR1 register
+  uint8_t t = readRegister8(max31856SpiSettings,pin_CS,MAX31856_CR1_REG_READ);
+  t &= 0x0F;
+
+  return (max31856_thermocoupletype_t)(t);
+}
+
+/*
+Display the TC type to the serial monitor 
+*/
 void displayThermocoupleType() {
     Serial.print("Thermocouple type: ");
     switch (getThermocoupleType() ) {
@@ -343,17 +364,6 @@ void displayThermocoupleType() {
       case MAX31856_VMODE_G32: Serial.println("Voltage x8 Gain mode"); break;
       default: Serial.println("Unknown"); break;
   }
-}
-
-/*
-Read TC type by reading from the CR1 register.
-*/
-max31856_thermocoupletype_t getThermocoupleType(void) {
-  //TC type is stored in bits 0-3 of CR1 register
-  uint8_t t = readRegister8(max31856SpiSettings,pin_CS,MAX31856_CR1_REG_READ);
-  t &= 0x0F;
-
-  return (max31856_thermocoupletype_t)(t);
 }
 
 /*
@@ -422,9 +432,12 @@ void setAveragingMode(max31856_averagingmode_t averagingMode) {
 //-----------------------CJTH/CJTL Functions-------------------------------
 /*
 Read the cold junction temperature by reading from the CJTH and CJTL registers
-and performing appropriate bitshifting.
+and performing appropriate bitshifting/conversions.
 */
 float readColdJunctionTemperature() {
+  //Version History
+  //12/18/24: Minor update to documentation
+  
   uint8_t dataCJTH = readRegister8(max31856SpiSettings,pin_CS,MAX31856_CJTH_REG_READ);
   uint8_t dataCJTL = readRegister8(max31856SpiSettings,pin_CS,MAX31856_CJTL_REG_READ);
   
