@@ -480,19 +480,20 @@ float readThermocoupleTemperature() {
   //Version History
   //12/12/24: Created
   //12/18/24: Moved triggerOneShot to loop.  Minor update to output variable name
+  //12/20/24: Changed from int32_t to uint32_t to be more consistent with rest of application
   
   //read the thermocouple temperature registers (3 bytes)
   uint8_t tcByte2 = readRegister8(max31856SpiSettings,pin_CS,MAX31856_LTCBH_REG_READ);
   uint8_t tcByte1 = readRegister8(max31856SpiSettings,pin_CS,MAX31856_LTCBM_REG_READ);
   uint8_t tcByte0 = readRegister8(max31856SpiSettings,pin_CS,MAX31856_LTCBL_REG_READ);
   
-  int32_t ret = tcByte2;
+  uint32_t ret = tcByte2;
   ret <<= 8;
   ret |= tcByte1;
   ret <<= 8;
   ret |= tcByte0;
 
-  int32_t temp24 = ret;
+  uint32_t temp24 = ret;
 
   //fix sign
   if (temp24 & 0x800000) {
