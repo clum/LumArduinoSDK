@@ -13,11 +13,13 @@ Version History
 12/11/24: Updated from hex to binary representation for ease of reading
 12/14/24: Updated documentation (while working to port to MATLAB)
 12/18/24: Minor update to documentation
+12/24/24: Minor update
+12/29/24: Changed back to int32_t so this correctly implements an arithmetic shift instead of a logical shift when dealing with negative numbers in readTC function
 */
 
 #include <SPI.h>
 #include <LumMisc.h>
-#include"LumSPI.h"
+#include <LumSPI.h>
 
 //CR0
 #define MAX31856_CR0_REG_READ     0x00          //Config 0 register (read)
@@ -457,16 +459,19 @@ and performing appropriate bitshifting/conversions.
 float readColdJunctionTemperature() {
   //Version History
   //12/18/24: Minor update to documentation
+  //12/29/24: Changed to int to correct Adafruit bug with sign.
+  //12/31/24: Explicit cast
   
   uint8_t dataCJTH = readRegister8(max31856SpiSettings,pin_CS,MAX31856_CJTH_REG_READ);
   uint8_t dataCJTL = readRegister8(max31856SpiSettings,pin_CS,MAX31856_CJTL_REG_READ);
-  
-  uint16_t ret = dataCJTH;
+
+  //store as a signed int16 so when it is cast to a float it retains the sign
+  int16_t ret = dataCJTH;
   
   ret <<= 8;
-  ret |= dataCJTL;
+  ret |= (int16_t)dataCJTL;
 
-  float tempCJ = ret/256.0;
+  float tempCJ = ((float)ret)/256.0;
 
   return tempCJ;
 }
@@ -481,28 +486,33 @@ float readThermocoupleTemperature() {
   //12/12/24: Created
   //12/18/24: Moved triggerOneShot to loop.  Minor update to output variable name
   //12/20/24: Changed from int32_t to uint32_t to be more consistent with rest of application
+  //12/29/24: Changed back to int32_t so this correctly implements an arithmetic shift instead of a logical shift
+  //12/31/24: Renaming bytes
+  //01/01/25: Final polishing
   
   //read the thermocouple temperature registers (3 bytes)
-  uint8_t tcByte2 = readRegister8(max31856SpiSettings,pin_CS,MAX31856_LTCBH_REG_READ);
-  uint8_t tcByte1 = readRegister8(max31856SpiSettings,pin_CS,MAX31856_LTCBM_REG_READ);
-  uint8_t tcByte0 = readRegister8(max31856SpiSettings,pin_CS,MAX31856_LTCBL_REG_READ);
-  
-  uint32_t ret = tcByte2;
+  //Note that these need to be uint8_t (not int8_t data types because this causes issues with bit shifting with negative values)
+  uint8_t tcByteH = readRegister8(max31856SpiSettings,pin_CS,MAX31856_LTCBH_REG_READ);
+  uint8_t tcByteM = readRegister8(max31856SpiSettings,pin_CS,MAX31856_LTCBM_REG_READ);
+  uint8_t tcByteL = readRegister8(max31856SpiSettings,pin_CS,MAX31856_LTCBL_REG_READ);
+ 
+  int32_t ret = tcByteH;
   ret <<= 8;
-  ret |= tcByte1;
+  ret |= (int32_t)tcByteM;
   ret <<= 8;
-  ret |= tcByte0;
+  ret |= (int32_t)tcByteL;
 
-  uint32_t temp24 = ret;
+  int32_t temp24 = ret;
 
-  //fix sign
-  if (temp24 & 0x800000) {
+  //check if value is negative or not
+  if(BitIs1(tcByteH,7)) {
+    //pad the left 8 bits with 1s
     temp24 |= 0xFF000000;
   }
 
-  //perform conversion
-  temp24 >>= 5; // bottom 5 bits are unused
-  float tempTC = temp24*0.0078125;
+  //perform conversion (bottom 5 bits are unused)
+  temp24 >>= 5;
+  float tempTC = ((float)temp24)*0.0078125;
 
   return tempTC;
 }
