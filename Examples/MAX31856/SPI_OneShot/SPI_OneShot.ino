@@ -15,6 +15,7 @@ Version History
 12/18/24: Minor update to documentation
 12/24/24: Minor update
 12/29/24: Changed back to int32_t so this correctly implements an arithmetic shift instead of a logical shift when dealing with negative numbers in readTC function
+01/05/25: Removing unncessary register addresses
 */
 
 #include <SPI.h>
@@ -30,7 +31,7 @@ Version History
 #define MAX31856_CR1_REG_WRITE    0x81          //Config 1 register (write)
 
 //MASK (AKA Fault Mask Register)
-#define MAX31856_MASK_REG_READ    0x02          //Fault Mask register (read)
+//#define MAX31856_MASK_REG_READ    0x02          //Fault Mask register (read)
 #define MAX31856_MASK_REG_WRITE   0x82          //Fault Mask register (write)
 
 //CJTO
