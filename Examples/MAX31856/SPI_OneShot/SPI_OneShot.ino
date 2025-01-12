@@ -31,7 +31,6 @@ Version History
 #define MAX31856_CR1_REG_WRITE    0x81          //Config 1 register (write)
 
 //MASK (AKA Fault Mask Register)
-//#define MAX31856_MASK_REG_READ    0x02          //Fault Mask register (read)
 #define MAX31856_MASK_REG_WRITE   0x82          //Fault Mask register (write)
 
 //CJTO
